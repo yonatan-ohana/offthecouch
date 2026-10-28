@@ -31,7 +31,7 @@
     <script src="Build/Web.loader.js"></script>
     <script>
       var bar = document.querySelector("#bar div");
-      createUnityInstance(document.querySelector("#unity-canvas"), {
+      var config = {
         arguments: [],
         dataUrl: "Build/Web.data.unityweb",
         frameworkUrl: "Build/Web.framework.js.unityweb",
@@ -40,7 +40,11 @@
         companyName: "Yonatan Ohana",
         productName: "Off the Couch",
         productVersion: "1.0.0",
-      }, function (progress) {
+      };
+      // For trying how sharp the game is drawn: ?dpr=1 draws one game pixel per screen point (softer, lighter work).
+      var sharpness = new URLSearchParams(location.search).get("dpr");
+      if (sharpness) config.devicePixelRatio = parseFloat(sharpness);
+      createUnityInstance(document.querySelector("#unity-canvas"), config, function (progress) {
         bar.style.width = Math.round(100 * progress) + "%";
       }).then(function () {
         document.getElementById("loading").remove();
