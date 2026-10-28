@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <!-- The browser version's page (see MacBuild.BuildWeb): the game fills the whole window, on the menu's kraft
+         paper, with a paper card and a bar while it loads. -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, user-scalable=no">
+    <meta name="robots" content="noindex"> <!-- a test page for now: kept out of search results -->
+    <title>Off the Couch</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <style>
+      html, body { margin: 0; height: 100%; overflow: hidden; background: #EFE4D2; }
+      #unity-canvas { position: fixed; inset: 0; width: 100%; height: 100%; display: block; background: #EFE4D2; outline: none; }
+      #loading { position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%) rotate(-1deg);
+        width: min(420px, calc(100vw - 64px)); box-sizing: border-box; padding: 26px 28px 24px; text-align: center;
+        background: #FFF8EC; border-radius: 6px; box-shadow: 5px 6px 0 rgba(59, 47, 42, .18);
+        font: 500 17px/1.4 -apple-system, "Segoe UI", system-ui, sans-serif; color: #7A6A5F; }
+      #loading h1 { margin: 0 0 6px; font-size: 32px; color: #E2553F; }
+      #loading p { margin: 0 0 16px; }
+      #bar { height: 12px; border-radius: 6px; background: #EFE4D2; overflow: hidden; }
+      #bar div { height: 100%; width: 0; background: #E2553F; transition: width .2s; }
+    </style>
+  </head>
+  <body>
+    <canvas id="unity-canvas" tabindex="-1"></canvas>
+    <div id="loading">
+      <h1>Off the Couch</h1>
+      <p>Getting the games ready…</p>
+      <div id="bar"><div></div></div>
+    </div>
+    <script src="Build/Web.loader.js"></script>
+    <script>
+      var bar = document.querySelector("#bar div");
+      createUnityInstance(document.querySelector("#unity-canvas"), {
+        arguments: [],
+        dataUrl: "Build/Web.data.unityweb",
+        frameworkUrl: "Build/Web.framework.js.unityweb",
+        codeUrl: "Build/Web.wasm.unityweb",
+        streamingAssetsUrl: "StreamingAssets",
+        companyName: "Yonatan Ohana",
+        productName: "Off the Couch",
+        productVersion: "1.0.0",
+      }, function (progress) {
+        bar.style.width = Math.round(100 * progress) + "%";
+      }).then(function () {
+        document.getElementById("loading").remove();
+        document.querySelector("#unity-canvas").focus(); // keys reach the game without a click first
+      }).catch(function (message) {
+        document.querySelector("#loading p").textContent = message;
+      });
+    </script>
+  </body>
+</html>
