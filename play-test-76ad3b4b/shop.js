@@ -129,14 +129,6 @@ var OTCShop = (function () {
       play(null);
       return ready().then(function () { show(codeWindow({ pending: waiting.pending, typed: waiting.typed })); });
     }
-    var signIn = document.getElementById("signin"); // the loading card's "Already bought? Sign in"
-    if (API && !kept("token") && signIn) {
-      signIn.hidden = false;
-      signIn.addEventListener("click", function (e) {
-        e.preventDefault();
-        account();
-      });
-    }
     if (API && !kept("token") && /[?&]signin\b/.test(location.search)) { // "Sign in" on the website
       history.replaceState(null, "", location.pathname);
       play(null);
