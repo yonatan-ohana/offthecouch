@@ -76,15 +76,17 @@
           document.getElementById("get").style.display = "none";
           document.querySelector("#loading p").textContent =
             "The games play on a computer with a camera, in Google Chrome. Send yourself the link to play there.";
-          if (navigator.share) {
-            document.getElementById("chrome").classList.add("phone");
-            var send = document.getElementById("send");
-            send.style.display = "block";
-            send.onclick = function () { // the phone's own share menu: email, WhatsApp, notes… (we see nothing of it)
-              navigator.share({ title: "Off the Couch", text: "Off the Couch: games you play with your body. Open on my computer in Chrome:", url: link })
-                .then(function () { send.textContent = "Sent! Open it on your computer"; }, function () {});
-            };
-          }
+          document.getElementById("chrome").classList.add("phone");
+          var send = document.getElementById("send"), note = "Off the Couch: games you play with your body. Open on my computer in Chrome:";
+          send.style.display = "block";
+          send.onclick = function () {
+            // The phone's own share menu (email, WhatsApp, notes…); browsers inside apps such as Instagram have none,
+            // so there a new email to themselves opens instead. Either way we see nothing of it.
+            if (navigator.share) navigator.share({ title: "Off the Couch", text: note, url: link })
+              .then(function () { send.textContent = "Sent! Open it on your computer"; }, function () {});
+            else location.href = "mailto:?subject=" + encodeURIComponent("Off the Couch: play on my computer") +
+              "&body=" + encodeURIComponent(note + "\n" + link);
+          };
         }
         document.getElementById("copy").onclick = function () {
           var copy = this;
