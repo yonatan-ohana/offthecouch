@@ -9,6 +9,8 @@ var OTCShop = (function () {
   // Where the online program is (on Cloudflare; see offthecouch-server). Until every service is set up there, buying
   // says it opens soon.
   var API = LOCAL ? "http://localhost:8821" : "https://api.cuzgames.com";
+  // While payments are in practice mode (fake test cards pay), buying is open only on this Mac and the hidden test page.
+  var PRACTICE_OK = LOCAL || /\/play-test-/.test(location.pathname);
   var PRICE = "$7.99", CONTACT = "yonatan@yo-software.com";
 
   var answer = 0;          // for the game: 0 while a window is open, then 1 bought, 2 closed, 3 something went wrong
@@ -90,6 +92,7 @@ var OTCShop = (function () {
     if (readying) return readying;
     readying = call("/api/config").then(function (r) {
       settings = r;
+      if (r.paddle && r.paddle.env === "sandbox" && !PRACTICE_OK) r.open = false;
       if (r.pretend || !r.open) return;
       return Promise.all([
         load("https://accounts.google.com/gsi/client").then(function () {
@@ -204,6 +207,7 @@ var OTCShop = (function () {
     if (!API) return show(soonWindow());
     show(waitWindow("One moment…"));
     ready().then(function () {
+      if (!settings.open) return show(soonWindow());
       if (!kept("token")) return show(welcomeWindow());
       return call("/api/me").then(function (r) {
         me = r.account;
