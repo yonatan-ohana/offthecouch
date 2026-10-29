@@ -10,15 +10,6 @@ const solid = () => bar.classList.toggle('solid', scrollY > 40);
 addEventListener('scroll', solid, { passive: true });
 solid();
 
-// "Watch the video" opens the video with sound in a window over the page.
-const box = document.querySelector('dialog.trailer'), film = box.querySelector('video');
-document.querySelectorAll('[data-trailer]').forEach(b => b.addEventListener('click', e => {
-  e.preventDefault(); box.showModal(); film.currentTime = 0; film.play().catch(() => {});
-}));
-box.querySelector('.trailer-x').addEventListener('click', () => box.close());
-box.addEventListener('click', e => { if (e.target === box) box.close(); });
-box.addEventListener('close', () => film.pause());
-
 // Plays each video only while it is on screen.
 function playWhileSeen(videos, threshold) {
   if (REDUCE) return;

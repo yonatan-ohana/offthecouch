@@ -143,11 +143,6 @@ details p { margin: -6px 0 22px; max-width: 620px; color: var(--muted); }
 .foot .by { margin-left: auto; }
 
 /* The video with sound, in a window over the page */
-.trailer { padding: 0; border: 0; background: transparent; width: min(1100px, 92vw); max-width: none; overflow: visible; }
-.trailer::backdrop { background: rgba(8, 9, 18, 0.88); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
-.trailer video { width: 100%; aspect-ratio: 16 / 9; background: #000000; border-radius: 16px; box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5); }
-.trailer-x { position: absolute; top: -52px; right: 0; width: 42px; height: 42px; border: 0; border-radius: 50%; background: rgba(255, 255, 255, 0.16); color: #FFFFFF; font: 600 20px/1 var(--sans); cursor: pointer; }
-.trailer-x:hover { background: rgba(255, 255, 255, 0.3); }
 
 /* Terms, refunds, privacy, contact and credits: one easy-to-read column */
 .page { max-width: 840px; padding-top: 160px; }
