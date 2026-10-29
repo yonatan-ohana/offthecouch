@@ -16,6 +16,7 @@ var OTCShop = (function () {
   var me = null;           // the signed-in account, once known
   var play = null;         // starts the game: play(null) the free download, play(files) the full one
   var robotToken = "", googleNext = null, paddleNext = null;
+  var whenClosed = null;   // once a window is closed without buying or signing in: start the game (after the website's "Sign in")
   var veil = null;
 
   // The game listens for keys on the whole page and swallows them. While a window is open, keys typed in it go to the
@@ -130,8 +131,14 @@ var OTCShop = (function () {
       return ready().then(function () { show(codeWindow({ pending: waiting.pending, typed: waiting.typed })); });
     }
     if (API && !kept("token") && /[?&]signin\b/.test(location.search)) { // "Sign in" on the website
+      // Only the sign-in window, on the bare page: the game starts once it is closed (signing in reloads the page).
       history.replaceState(null, "", location.pathname);
-      play(null);
+      var loading = document.getElementById("loading");
+      if (loading) loading.style.display = "none";
+      whenClosed = function () {
+        if (loading) loading.style.display = "";
+        play(null);
+      };
       return account();
     }
     if (!API || !kept("token")) return play(null);
@@ -248,6 +255,11 @@ var OTCShop = (function () {
   function closed() {
     close();
     answer = 2;
+    if (whenClosed) {
+      var then = whenClosed;
+      whenClosed = null;
+      then();
+    }
   }
 
   // closable: shows the ✕ (Escape too), which closes without buying; wide: for two buttons side by side.
@@ -680,7 +692,8 @@ var OTCShop = (function () {
   }
 
   function problemWindow(text) {
-    return win([title("Something went wrong"), para(text), button("Close", "glass", function () { close(); answer = 3; })], { onclose: function () { close(); answer = 3; } });
+    var done = function () { closed(); answer = 3; }; // closed() also starts the game when it is waiting
+    return win([title("Something went wrong"), para(text), button("Close", "glass", done)], { onclose: done });
   }
 
   // ---- Pretend windows, on this Mac only: stand-ins for Google's and the payment company's own windows
