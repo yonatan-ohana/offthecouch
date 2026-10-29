@@ -123,6 +123,12 @@ var OTCShop = (function () {
     play = go;
     var asked = /[?&](stopped|playhere)\b/.exec(location.search);
     if (asked) history.replaceState(null, "", location.pathname);
+    var waiting = null;
+    try { waiting = JSON.parse(kept("pending") || "null"); } catch (e) {}
+    if (API && !kept("token") && waiting) { // a phone purchase left before its code was typed
+      play(null);
+      return ready().then(function () { show(codeWindow({ pending: waiting.pending, typed: waiting.typed })); });
+    }
     if (!API || !kept("token")) return play(null);
     call("/api/me").then(function (r) {
       me = r.account;
@@ -376,7 +382,10 @@ var OTCShop = (function () {
       var typed = "+" + country.value + " " + number.value.trim();
       busy(box, true, error);
       call("/api/phone/start", { phone: phone, purpose: purpose, robot: robotToken }).then(function (r) {
-        if (buying) return pay("p:" + r.pending, null, { pending: r.pending, typed: typed });
+        if (buying) {
+          kept("pending", JSON.stringify({ pending: r.pending, typed: typed }));
+          return pay("p:" + r.pending, null, { pending: r.pending, typed: typed });
+        }
         if (!r.found) return busy(box, false, error, "We couldn't find a purchase for this number. Check it, or sign in with Google if you used that.");
         show(codeWindow({ phone: phone, typed: typed, pretendCode: r.pretendCode }));
       }, function (e) {
@@ -436,7 +445,10 @@ var OTCShop = (function () {
         if (r.paid) return show(codeWindow({ pending: phone.pending, typed: phone.typed, pretendCode: r.pretendCode }));
         if (++tries < 45) return setTimeout(look, 2000);
         show(slowWindow(function () { waitForCode(phone); }));
-      }, function (e) { show(problemWindow(problem(e))); });
+      }, function (e) {
+        if (e && e.error === "text") return show(textFailedWindow(phone));
+        show(problemWindow(problem(e)));
+      });
     })();
   }
 
@@ -488,6 +500,7 @@ var OTCShop = (function () {
       if (code.pending) ask.pending = code.pending;
       else ask.phone = code.phone;
       call("/api/phone/check", ask).then(function (r) {
+        if (code.pending) kept("pending", null);
         signedIn(r);
         show(me.bought ? doneWindow(!!code.pending) : unboughtWindow());
       }, function (e) {
@@ -639,6 +652,17 @@ var OTCShop = (function () {
       para("The payment company hasn't told us yet. It can take a minute. If it takes longer, write to " + CONTACT + " and we'll sort it out."),
       button("Look again", "main", again),
     ]);
+  }
+
+  // Paid, but the text with the code couldn't be sent just now.
+  function textFailedWindow(phone) {
+    return win([
+      kicker("Almost done"),
+      title("We couldn't text your code"),
+      para("Your payment went through. Our text to " + phone.typed + " didn't go out. Try again in a moment."),
+      button("Try again", "main", function () { waitForCode(phone); }),
+      fine("Still nothing? Write to " + CONTACT + ". Your purchase is safe."),
+    ], { closable: false });
   }
 
   function soonWindow() {
