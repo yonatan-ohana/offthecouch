@@ -25,6 +25,10 @@
       #chrome button { font: inherit; font-weight: 700; color: #FFFFFF; background: #17847C; border: 0; border-radius: 6px;
         padding: 10px 18px; cursor: pointer; }
       #chrome a { color: #17847C; font-weight: 700; }
+      #chrome.phone { flex-direction: column; gap: 12px; }
+      #chrome.phone #copy { background: none; color: #17847C; padding: 4px; text-decoration: underline; font-weight: 600; }
+      #send { display: none; font: inherit; font-weight: 700; color: #FFFFFF; background: #17847C; border: 0;
+        border-radius: 6px; padding: 12px 22px; cursor: pointer; }
     </style>
   </head>
   <body>
@@ -34,6 +38,7 @@
       <p>Getting the games ready…</p>
       <div id="bar"><div></div></div>
       <div id="chrome">
+        <button id="send">Send it to myself</button>
         <button id="copy">Copy the link</button>
         <a id="get" href="https://www.google.com/chrome/" target="_blank" rel="noopener">Get Chrome</a>
       </div>
@@ -66,13 +71,27 @@
           "The games play in Google Chrome on a computer. Open this page there to play.";
         document.getElementById("bar").style.display = "none";
         document.getElementById("chrome").style.display = "flex";
-        if (navigator.maxTouchPoints > 1) document.getElementById("get").style.display = "none"; // a phone or tablet
+        var link = location.origin + location.pathname;
+        if ((browser && browser.mobile) || navigator.maxTouchPoints > 1) { // a phone or tablet: send the link to themselves, to open on a computer later
+          document.getElementById("get").style.display = "none";
+          document.querySelector("#loading p").textContent =
+            "The games play on a computer with a camera, in Google Chrome. Send yourself the link to play there.";
+          if (navigator.share) {
+            document.getElementById("chrome").classList.add("phone");
+            var send = document.getElementById("send");
+            send.style.display = "block";
+            send.onclick = function () { // the phone's own share menu: email, WhatsApp, notes… (we see nothing of it)
+              navigator.share({ title: "Off the Couch", text: "Off the Couch: games you play with your body. Open on my computer in Chrome:", url: link })
+                .then(function () { send.textContent = "Sent! Open it on your computer"; }, function () {});
+            };
+          }
+        }
         document.getElementById("copy").onclick = function () {
           var copy = this;
-          navigator.clipboard.writeText(location.href).then(function () {
+          navigator.clipboard.writeText(link).then(function () {
             copy.textContent = "Copied: paste it into Chrome";
           }, function () {
-            document.querySelector("#loading p").textContent = "Open this address in Google Chrome on a computer: " + location.href;
+            document.querySelector("#loading p").textContent = "Open this address in Google Chrome on a computer: " + link;
           });
         };
       } else OTCShop.start(play);
