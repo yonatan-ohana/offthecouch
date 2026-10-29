@@ -133,27 +133,35 @@ var OTCShop = (function () {
       play(null);
       return ready().then(function () { show(codeWindow({ pending: waiting.pending, typed: waiting.typed })); });
     }
+    var unlock = /[?&]unlock\b/.test(location.search);
+    if (unlock) history.replaceState(null, "", location.pathname);
     if (API && !kept("token") && /[?&]signin\b/.test(location.search)) { // "Sign in" on the website
-      // Only the sign-in window, on the bare page: the game starts once it is closed (signing in reloads the page).
       history.replaceState(null, "", location.pathname);
-      var loading = document.getElementById("loading");
-      if (loading) loading.style.display = "none";
-      whenClosed = function () {
-        if (loading) loading.style.display = "";
-        play(null);
-      };
-      return account();
+      return alone(account);
     }
+    if (API && !kept("token") && unlock) return alone(buy); // "Unlock in your browser" on the website
     if (!API || !kept("token")) return play(null);
     call("/api/me").then(function (r) {
       me = r.account;
-      if (!me.bought) return play(null);
+      if (!me.bought) return unlock ? alone(buy) : play(null);
       if (asked && asked[1] === "stopped") show(stoppedWindow());
       else takeTurn(!!asked);
     }, function (e) {
       if (e.status === 401) kept("token", null);
       play(null);
     });
+  }
+
+  // Only one window (signing in, or unlocking), on the bare page: the game starts once it is closed (signing in or
+  // buying reloads the page).
+  function alone(open) {
+    var loading = document.getElementById("loading");
+    if (loading) loading.style.display = "none";
+    whenClosed = function () {
+      if (loading) loading.style.display = "";
+      play(null);
+    };
+    open();
   }
 
   // take: "Play here instead" (the other computer stops); otherwise ask when another computer is playing.

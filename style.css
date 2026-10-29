@@ -116,6 +116,9 @@ h1, h2, h3 { margin: 0; font-weight: 800; letter-spacing: -0.035em; line-height:
 .place { display: flex; align-items: center; gap: 14px; padding: 16px 18px; border-radius: 16px; background: rgba(255, 255, 255, 0.06); font-weight: 700; }
 .place .soon { margin-left: auto; }
 .place.main { background: #FFFFFF; color: #0B0D18; }
+a.place.main { text-decoration: none; transition: transform 0.15s; }
+a.place.main:hover { transform: translateY(-2px); }
+.place .go { margin-left: auto; color: var(--teal); font-weight: 800; white-space: nowrap; }
 .places .fine { margin-top: 6px; }
 
 /* Help */
