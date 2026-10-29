@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <!-- The browser version's page (see MacBuild.BuildWeb): the game fills the whole window, on the menu's kraft
+         paper, with a paper card and a bar while it loads. The shop (shop.js, in the website's look) decides which
+         download to load: the free one, or every game for a signed-in buyer whose computer is the one playing. -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, user-scalable=no">
+    <meta name="robots" content="noindex"> <!-- a test page for now: kept out of search results -->
+    <title>Off the Couch</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="stylesheet" href="shop.css">
+    <style>
+      html, body { margin: 0; height: 100%; overflow: hidden; background: #FBF3E4; }
+      #unity-canvas { position: fixed; inset: 0; width: 100%; height: 100%; display: block; background: #FBF3E4; outline: none; }
+      #loading { position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%) rotate(-1deg);
+        width: min(420px, calc(100vw - 64px)); box-sizing: border-box; padding: 26px 28px 24px; text-align: center;
+        background: #FFFFFF; border-radius: 6px; box-shadow: 5px 6px 0 rgba(43, 45, 66, .18);
+        font: 500 17px/1.4 -apple-system, "Segoe UI", system-ui, sans-serif; color: #5C5F73; }
+      #loading h1 { margin: 0 0 6px; font-size: 32px; color: #17847C; }
+      #loading p { margin: 0 0 16px; }
+      #bar { height: 12px; border-radius: 6px; background: #FBF3E4; overflow: hidden; }
+      #bar div { height: 100%; width: 0; background: #17847C; transition: width .2s; }
+      #chrome { display: none; gap: 20px; justify-content: center; align-items: center; }
+      #chrome button { font: inherit; font-weight: 700; color: #FFFFFF; background: #17847C; border: 0; border-radius: 6px;
+        padding: 10px 18px; cursor: pointer; }
+      #chrome a { color: #17847C; font-weight: 700; }
+    </style>
+  </head>
+  <body>
+    <canvas id="unity-canvas" tabindex="-1"></canvas>
+    <div id="loading">
+      <h1>Off the Couch</h1>
+      <p>Getting the games ready…</p>
+      <div id="bar"><div></div></div>
+      <div id="chrome">
+        <button id="copy">Copy the link</button>
+        <a id="get" href="https://www.google.com/chrome/" target="_blank" rel="noopener">Get Chrome</a>
+      </div>
+    </div>
+    <script src="shop.js"></script>
+    <script>
+      var bar = document.querySelector("#bar div");
+      var config = {
+        arguments: [],
+        dataUrl: "Build/Web.data.unityweb",
+        frameworkUrl: "Build/Web.framework.js.unityweb",
+        codeUrl: "Build/Web.wasm.unityweb",
+        streamingAssetsUrl: "StreamingAssets",
+        companyName: "Yonatan Ohana",
+        productName: "Off the Couch",
+        productVersion: "1.0.0",
+      };
+      // For trying how sharp the game is drawn: ?dpr=1 draws one game pixel per screen point (softer, lighter work).
+      var sharpness = new URLSearchParams(location.search).get("dpr");
+      if (sharpness) config.devicePixelRatio = parseFloat(sharpness);
+
+      // The body reading is only quick enough in Chrome and the browsers built on it (Edge, Brave, Arc, Opera) on a
+      // computer: Safari was far too slow (owner, 2026-10-28), and phones and tablets may run out of memory. Any other
+      // browser gets a card asking for Chrome instead of the game's download. ?anybrowser skips this, for trying others.
+      var browser = navigator.userAgentData;
+      var playable = new URLSearchParams(location.search).has("anybrowser") || !!(browser && !browser.mobile &&
+        browser.platform !== "Android" && browser.brands.some(function (b) { return b.brand === "Chromium"; }));
+      if (!playable) {
+        document.querySelector("#loading p").textContent =
+          "The games play in Google Chrome on a computer. Open this page there to play.";
+        document.getElementById("bar").style.display = "none";
+        document.getElementById("chrome").style.display = "flex";
+        if (navigator.maxTouchPoints > 1) document.getElementById("get").style.display = "none"; // a phone or tablet
+        document.getElementById("copy").onclick = function () {
+          var copy = this;
+          navigator.clipboard.writeText(location.href).then(function () {
+            copy.textContent = "Copied: paste it into Chrome";
+          }, function () {
+            document.querySelector("#loading p").textContent = "Open this address in Google Chrome on a computer: " + location.href;
+          });
+        };
+      } else OTCShop.start(play);
+
+      // Loads and starts the game: the free download, or the full one (full: where its four files are).
+      function play(full) {
+        if (full) {
+          config.dataUrl = full.data;
+          config.frameworkUrl = full.framework;
+          config.codeUrl = full.code;
+        }
+        var loader = document.createElement("script");
+        loader.src = full ? full.loader : "Build/Web.loader.js";
+        loader.onerror = function () {
+          document.querySelector("#loading p").textContent = "The games did not download. Check the internet and reload the page.";
+        };
+        loader.onload = function () {
+          createUnityInstance(document.querySelector("#unity-canvas"), config, function (progress) {
+            bar.style.width = Math.round(100 * progress) + "%";
+          }).then(function () {
+            document.getElementById("loading").remove();
+            document.querySelector("#unity-canvas").focus(); // keys reach the game without a click first
+          }).catch(function (message) {
+            document.querySelector("#loading p").textContent = message;
+          });
+        };
+        document.body.appendChild(loader);
+      }
+    </script>
+  </body>
+</html>
