@@ -3,27 +3,161 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Off the Couch</title>
+<title>Off the Couch: arcade for your body</title>
+<meta name="description" content="Games you play with your whole body, using your camera. No controller needed. Play Fruit Slicer free in your browser.">
+<meta property="og:title" content="Off the Couch: arcade for your body">
+<meta property="og:description" content="Games you play with your whole body, using your camera. Play Fruit Slicer free in your browser.">
+<meta property="og:image" content="https://offthecouch.yo-software.com/img/share.jpg">
+<meta property="og:url" content="https://offthecouch.yo-software.com/">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#0B0D18">
+<link rel="icon" href="favicon.png">
+<link rel="preload" href="fonts/CaveatBrush-Regular.ttf" as="font" type="font/ttf" crossorigin>
 <link rel="stylesheet" href="style.css">
+<script>document.documentElement.classList.add('js');</script>
 </head>
 <body>
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="./"><img src="img/icon.png" alt="">Off the Couch</a>
+    <nav aria-label="Main"><a href="#games">Games</a><a href="#how">How it works</a><a href="#price">Price</a><a href="#help">Help</a></nav>
+    <a class="btn btn-main btn-small" href="play/">Play free</a>
+  </div>
+</header>
+
 <main>
-  <h1>Off the Couch</h1>
-  <h2>Arcade for your body</h2>
-  <p>Games you play with your whole body, using your Mac's camera. No controller needed.</p>
+<section class="hero">
+  <video src="video/hero.mp4" poster="video/hero.jpg" autoplay muted loop playsinline></video>
+  <div class="wrap hero-in">
+    <span class="now"><i></i>Playing <b id="now">Fruit Slicer</b></span>
+    <h1>Arcade for<br>your <span>body.</span></h1>
+    <p class="lead">Games you play with your whole body, using your camera. No controller, no headset: stand back, move, and the game follows you.</p>
+    <div class="ctas">
+      <a class="btn btn-main" href="play/"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24"><path d="M7 4l13 8-13 8z" fill="currentColor"/></svg>Play Fruit Slicer free</a>
+      <a class="btn btn-glass" href="video/trailer.mp4" data-trailer><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M10 8.5l5.5 3.5-5.5 3.5z" fill="currentColor" stroke="none"/></svg>Watch the video</a>
+    </div>
+    <p class="fine">Plays right here in Google Chrome on a computer with a camera. Nothing to install.</p>
+    <div class="coming">Coming soon: <b>Mac App Store</b><b>App Store for iPad</b><b>Steam for Windows</b></div>
+  </div>
+</section>
 
-  <h3>Help</h3>
-  <p><strong>The game can't see me.</strong> Stand where your whole upper body is in the camera picture, with good light in front of you, not behind you.</p>
-  <p><strong>The camera is off.</strong> Open System Settings → Privacy &amp; Security → Camera, and turn on Off the Couch.</p>
-  <p><strong>I bought "Unlock all games" before.</strong> Open Off the Couch, choose "Settings" on the menu, then "Restore purchase".</p>
+<div class="roll" aria-hidden="true"><div><span>Slice</span><span>Run</span><span>Fly</span><span>Ski</span><span>Save</span><span>Pose</span><span>Flap</span><span>Balance</span><span>Slice</span><span>Run</span><span>Fly</span><span>Ski</span><span>Save</span><span>Pose</span><span>Flap</span><span>Balance</span></div></div>
 
-  <h3>Contact</h3>
-  <p>Questions or problems? Write to <a href="mailto:yonatan@yo-software.com">yonatan@yo-software.com</a>.</p>
+<section class="wrap block" id="games">
+  <div class="head rise">
+    <div><p class="kicker">The games</p><h2>Pick a game.<br><span>Then move.</span></h2></div>
+    <p class="sub">Every game is played standing up, with your arms, your legs and your whole body. Point at a game to watch someone play it.</p>
+  </div>
+  <ul class="grid">
+    <li class="card big rise">
+      <video class="play" muted loop playsinline preload="none" poster="video/play/fruit-slicer.jpg" src="video/play/fruit-slicer.mp4"></video>
+      <div class="cam"><video muted loop playsinline preload="none" poster="video/people/fruit-slicer.jpg" src="video/people/fruit-slicer.mp4"></video><em>Player</em></div>
+      <div class="about"><span class="tag free">Free</span><h3>Fruit Slicer</h3><p>Slice fruit with your hands.</p><a class="btn btn-main btn-small" href="play/">Play free now</a></div>
+    </li>
+    <li class="card rise">
+      <video class="play" muted loop playsinline preload="none" poster="video/play/body-runner.jpg" src="video/play/body-runner.mp4"></video>
+      <div class="cam"><video muted loop playsinline preload="none" poster="video/people/body-runner.jpg" src="video/people/body-runner.mp4"></video><em>Player</em></div>
+      <div class="about"><span class="tag lock">Unlock</span><h3>Body Runner</h3><p>Jump, duck and dodge down the road.</p></div>
+    </li>
+    <li class="card rise">
+      <video class="play" muted loop playsinline preload="none" poster="video/play/airplane.jpg" src="video/play/airplane.mp4"></video>
+      <div class="cam"><video muted loop playsinline preload="none" poster="video/people/airplane.jpg" src="video/people/airplane.mp4"></video><em>Player</em></div>
+      <div class="about"><span class="tag lock">Unlock</span><h3>Airplane</h3><p>Spread your arms and fly through the rings.</p></div>
+    </li>
+    <li class="card rise">
+      <video class="play" muted loop playsinline preload="none" poster="video/play/ski-slalom.jpg" src="video/play/ski-slalom.mp4"></video>
+      <div class="cam"><video muted loop playsinline preload="none" poster="video/people/ski-slalom.jpg" src="video/people/ski-slalom.mp4"></video><em>Player</em></div>
+      <div class="about"><span class="tag lock">Unlock</span><h3>Ski Slalom</h3><p>Lean into every turn, crouch for speed.</p></div>
+    </li>
+    <li class="card rise">
+      <video class="play" muted loop playsinline preload="none" poster="video/play/goalkeeper.jpg" src="video/play/goalkeeper.mp4"></video>
+      <div class="cam"><video muted loop playsinline preload="none" poster="video/people/goalkeeper.jpg" src="video/people/goalkeeper.mp4"></video><em>Player</em></div>
+      <div class="about"><span class="tag lock">Unlock</span><h3>Goalkeeper</h3><p>Reach and step to stop every shot.</p></div>
+    </li>
+    <li class="card rise">
+      <video class="play" muted loop playsinline preload="none" poster="video/play/hole-in-the-wall.jpg" src="video/play/hole-in-the-wall.mp4"></video>
+      <div class="cam"><video muted loop playsinline preload="none" poster="video/people/hole-in-the-wall.jpg" src="video/people/hole-in-the-wall.mp4"></video><em>Player</em></div>
+      <div class="about"><span class="tag lock">Unlock</span><h3>Hole in the Wall</h3><p>Strike the pose before the wall arrives.</p></div>
+    </li>
+    <li class="card rise">
+      <video class="play" muted loop playsinline preload="none" poster="video/play/bird-flap.jpg" src="video/play/bird-flap.mp4"></video>
+      <div class="cam"><video muted loop playsinline preload="none" poster="video/people/bird-flap.jpg" src="video/people/bird-flap.mp4"></video><em>Player</em></div>
+      <div class="about"><span class="tag lock">Unlock</span><h3>Bird Flap</h3><p>Flap your arms to keep the bird flying.</p></div>
+    </li>
+    <li class="card rise">
+      <video class="play" muted loop playsinline preload="none" poster="video/play/tightrope.jpg" src="video/play/tightrope.mp4"></video>
+      <div class="cam"><video muted loop playsinline preload="none" poster="video/people/tightrope.jpg" src="video/people/tightrope.mp4"></video><em>Player</em></div>
+      <div class="about"><span class="tag lock">Unlock</span><h3>Tightrope</h3><p>Keep your balance high above the town.</p></div>
+    </li>
+    <li class="card more rise"><span class="plus">+</span><h3>New games join here</h3><p>One purchase opens every game we add later.</p></li>
+  </ul>
+</section>
 
-  <h3>Credits</h3>
-  <p>Made by Cuz Games. Body tracking: Google MediaPipe (BlazePose and BlazeHand), used under the <a href="https://www.apache.org/licenses/LICENSE-2.0">Apache License 2.0</a>. Music and sounds from Pixabay. Fonts: Caveat Brush, Nunito and Inter (SIL Open Font License).</p>
+<section class="wrap block" id="how">
+  <div class="how">
+    <div class="how-clip rise"><video src="video/people/ski-slalom.mp4" poster="video/people/ski-slalom.jpg" muted loop playsinline preload="none"></video><span>About 2 metres from the screen</span></div>
+    <div class="rise">
+      <p class="kicker">How it works</p>
+      <h2>Your body is<br>the controller.</h2>
+      <div class="step"><b>01</b><h3>Make some room</h3><p>Clear about 2 metres around you. Mind furniture, pets and little ones.</p></div>
+      <div class="step"><b>02</b><h3>Let the camera see you</h3><p>Step back until your whole upper body is in the picture, with light in front of you.</p></div>
+      <div class="step"><b>03</b><h3>Move to play</h3><p>Slice, jump, lean and flap. The game follows every move.</p></div>
+    </div>
+  </div>
+  <div class="trust rise">
+    <div><b>No controller</b><span>Just you and the camera you already have.</span></div>
+    <div><b>Nothing to install</b><span>Fruit Slicer plays right in Chrome.</span></div>
+    <div><b>Your camera stays private</b><span>The pictures never leave your computer.</span></div>
+  </div>
+</section>
 
-  <p><a href="privacy.html">Privacy</a></p>
+<section class="wrap block" id="price">
+  <div class="price rise">
+    <div class="say">
+      <p class="kicker">One price, paid once</p>
+      <h2>All games <span>$7.99</span></h2>
+      <p>Fruit Slicer is free. One purchase opens all the other games, and every new game later. No subscription, no ads, no account.</p>
+    </div>
+    <div class="places">
+      <div class="place main">Unlock in your browser <span class="soon">Coming soon</span></div>
+      <div class="place">Mac App Store <span class="soon">Coming soon</span></div>
+      <div class="place">App Store for iPad <span class="soon">Coming soon</span></div>
+      <div class="place">Steam for Windows <span class="soon">Coming soon</span></div>
+      <p class="fine">Each place keeps its own purchase: buying in the browser opens the games in the browser.</p>
+    </div>
+  </div>
+</section>
+
+<section class="wrap block" id="help">
+  <div class="help">
+    <div class="rise">
+      <p class="kicker">Help</p>
+      <h2>Questions?</h2>
+      <p class="sub">Something else? Write to <a href="mailto:yonatan@yo-software.com">yonatan@yo-software.com</a> and tell us what you see.</p>
+    </div>
+    <div class="rise">
+      <details><summary>The game can't see me.</summary><p>Stand where your whole upper body is in the camera picture, with good light in front of you, not behind you.</p></details>
+      <details><summary>What do I need?</summary><p>Any computer with a camera and Google Chrome to play in the browser. Then about 2 metres of space.</p></details>
+      <details><summary>The camera is off.</summary><p>In Chrome: click the icon at the left end of the address bar and turn on "Camera".</p></details>
+      <details><summary>I bought the games before.</summary><p>In the app: choose "Settings" on the menu, then "Restore purchase".</p></details>
+    </div>
+  </div>
+</section>
 </main>
+
+<footer class="foot">
+  <div class="wrap">
+    <a class="brand" href="./"><img src="img/icon.png" alt="">Off the Couch</a>
+    <a href="terms.html">Terms</a><a href="refunds.html">Refunds</a><a href="privacy.html">Privacy</a><a href="contact.html">Contact</a><a href="credits.html">Credits</a>
+    <span class="by">Made by Cuz Games · <a href="mailto:yonatan@yo-software.com">yonatan@yo-software.com</a></span>
+  </div>
+</footer>
+
+<dialog class="trailer">
+  <button class="trailer-x" aria-label="Close the video">✕</button>
+  <video controls playsinline preload="none" poster="video/trailer.jpg" src="video/trailer.mp4"></video>
+</dialog>
+
+<script src="site.js"></script>
 </body>
 </html>
