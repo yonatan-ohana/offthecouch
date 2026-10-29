@@ -18,6 +18,14 @@ var OTCShop = (function () {
   var robotToken = "", googleNext = null, paddleNext = null;
   var veil = null;
 
+  // The game listens for keys on the whole page and swallows them. While a window is open, keys typed in it go to the
+  // window only: this listener runs before the game's (it is added first, and catches keys on their way down).
+  ["keydown", "keyup", "keypress"].forEach(function (type) {
+    addEventListener(type, function (e) {
+      if (veil && !veil.hidden && veil.contains(e.target)) e.stopImmediatePropagation();
+    }, true);
+  });
+
   // ---- Kept on this computer: its own random name, and its sign-in key
 
   function kept(name, value) {
