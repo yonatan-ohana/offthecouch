@@ -124,6 +124,8 @@ var OTCShop = (function () {
   // ---- Starting the page: the full download for a signed-in buyer whose computer gets the turn, else the free one
 
   function start(go) {
+    step("page");
+    watchReader();
     play = go;
     var asked = /[?&](stopped|playhere)\b/.exec(location.search);
     if (asked) history.replaceState(null, "", location.pathname);
@@ -195,9 +197,40 @@ var OTCShop = (function () {
     });
   }
 
+  // ---- How far players get (see /api/step in the online program): each step counted once per visit, as a total
+  // only. Nothing about who is sent: no internet address, no account, no computer name, no camera picture.
+
+  var counted = {};
+  function step(name, game) {
+    var key = name + "|" + (game || "");
+    if (!API || counted[key]) return;
+    counted[key] = true;
+    try {
+      fetch(API + "/api/step", { method: "POST", keepalive: true, headers: { "Content-Type": "text/plain" },
+        body: JSON.stringify({ step: name, game: game || "" }) }).catch(function () {});
+    } catch (e) {}
+  }
+
+  // Once the game is loading: the camera's answer and the first time the body reader sees someone, read from the
+  // reader (BrowserReader.jspre in the game) about once a second, for up to half an hour.
+  function watchReader() {
+    var since = Date.now();
+    var timer = setInterval(function () {
+      var reader = window.OTCReader;
+      if (reader) {
+        if (reader.camera === 3) step("camera_on");
+        else if (reader.camera === 2) step("camera_refused");
+        else if (reader.camera === 4) step("camera_none");
+        if (reader.bodyFound) step("person");
+      }
+      if (counted["person|"] || Date.now() - since > 30 * 60000) clearInterval(timer);
+    }, 1000);
+  }
+
   // ---- What the game asks for
 
   function buy() {
+    step("unlock");
     answer = 0;
     if (!API) return show(soonWindow());
     show(waitWindow("One moment…"));
@@ -777,5 +810,5 @@ var OTCShop = (function () {
     return /^[1-9]\d{7,14}$/.test(number) ? "+" + number : null;
   }
 
-  return { start: start, buy: buy, account: account, takeAnswer: takeAnswer };
+  return { start: start, buy: buy, account: account, takeAnswer: takeAnswer, step: step };
 })();
