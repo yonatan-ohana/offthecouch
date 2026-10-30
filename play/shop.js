@@ -379,7 +379,7 @@ var OTCShop = (function () {
       title("All games ", PRICE),
       para("Paid once, with every new game we add."),
       h("hr"),
-      para("How will you sign in on your other computers?", "otc-ask"),
+      para("How will you sign in on your other devices?", "otc-ask"),
       googleButton(function (account) {
         if (account.bought) return show(doneWindow(false));
         pay(account.ref, account.label);
@@ -398,7 +398,7 @@ var OTCShop = (function () {
       para("Sign in to open the games you bought."),
       googleButton(function (account) { show(account.bought ? doneWindow(false) : unboughtWindow()); }),
       button("Use my phone number", "glass", function () { show(phoneWindow("signin")); }, PHONE),
-      fine("This computer stays signed in after this."),
+      fine("This device stays signed in after this."),
       link("Haven't bought yet? Unlock all games · " + PRICE, function () { show(unlockWindow()); }),
     ]);
   }
@@ -422,7 +422,7 @@ var OTCShop = (function () {
     var box = win([
       kicker(buying ? "Unlock all games · " + PRICE : "Already bought"),
       title("Your phone number"),
-      para(buying ? "You'll use it to sign in on your other computers." : "The number you used when you bought the games."),
+      para(buying ? "You'll use it to sign in on your other devices." : "The number you used when you bought the games."),
       h("div", { class: "otc-field" }, [country, number]),
       error,
       robot,
@@ -530,7 +530,7 @@ var OTCShop = (function () {
       code.pretendCode ? h("p", { class: "otc-pretend", text: "Pretend text message (on this Mac only): your code is " + code.pretendCode }) : null,
       again,
       link("Wrong number? Change it", function () { show(code.pending ? changeWindow(code) : phoneWindow("signin")); }),
-      fine(code.pending ? "You've paid. This code just ties the games to your phone number." : "This computer stays signed in after this."),
+      fine(code.pending ? "You've paid. This code just ties the games to your phone number." : "This device stays signed in after this."),
     ]);
     boxes.forEach(function (input, i) {
       input.addEventListener("input", function () {
@@ -611,8 +611,8 @@ var OTCShop = (function () {
       bits,
       h("span", { class: "otc-check" }, [icon(CHECK.replace(/26/g, "40").replace('stroke-width="2.6"', 'stroke-width="3"'))]),
       bought ? title("All games are ", "yours!") : title("Welcome ", "back!"),
-      para(bought ? "Every game is open now. This computer stays signed in, so next time you just play." : "Your games are here. This computer stays signed in, so next time you just play."),
-      bought ? fine("On another computer, sign in with the same Google account or phone number.") : null,
+      para(bought ? "Every game is open now. This device stays signed in, so next time you just play." : "Your games are here. This device stays signed in, so next time you just play."),
+      bought ? fine("On another device, sign in with the same Google account or phone number.") : null,
       button("Let's play", "main", function () { location.replace(location.pathname); }), // asks first if another computer is playing
     ], { center: true, closable: false });
   }
@@ -621,8 +621,8 @@ var OTCShop = (function () {
   function elsewhereWindow(fromGame) {
     return win([
       kicker("One at a time"),
-      title("Playing on another computer"),
-      para("Your games are open on another computer right now. Only one computer can play at a time."),
+      title("Playing on another device"),
+      para("Your games are open on another device right now. Only one device can play at a time."),
       h("div", { class: "otc-two" }, [
         button("Play here instead", "main", function () {
           if (fromGame) return location.replace(location.pathname + "?playhere");
@@ -642,7 +642,7 @@ var OTCShop = (function () {
   function stoppedWindow() {
     return win([
       kicker("Paused"),
-      title("Now playing on another computer"),
+      title("Now playing on another device"),
       para("The game stopped here. Press below to bring it back."),
       button("Play here instead", "main", function () {
         show(waitWindow("One moment…"));
@@ -668,7 +668,7 @@ var OTCShop = (function () {
           : [h("b", { text: "Not bought yet" }), h("span", { text: "Fruit Slicer is free to play." })])]),
       me.bought ? null : button("Unlock all games · " + PRICE, "main", function () { pay(me.ref, me.how === "google" ? me.label : null); }),
       h("div", { class: "otc-two" }, [
-        button("Sign out of this computer", "glass", function () {
+        button("Sign out of this device", "glass", function () {
           call("/api/signout", {}).catch(function () {});
           forget();
           location.replace(location.pathname); // back to the free game
@@ -682,7 +682,7 @@ var OTCShop = (function () {
     var error = h("p", { class: "otc-error", role: "alert" });
     var box = win([
       title("Delete your account?"),
-      para("This removes your sign-in and your purchase record, and the games lock on every computer."),
+      para("This removes your sign-in and your purchase record, and the games lock on every device."),
       fine("Changed your mind about buying? Within 14 days you can ask for a refund instead."),
       error,
       h("div", { class: "otc-two" }, [
