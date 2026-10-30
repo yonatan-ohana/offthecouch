@@ -62,7 +62,7 @@
         <a id="get" href="https://www.google.com/chrome/" target="_blank" rel="noopener">Get Chrome</a>
       </div>
     </div>
-    <div id="turn">Turn your phone sideways to play</div>
+    <div id="turn">Turn your device sideways to play</div>
     <div id="numbers"></div>
     <button id="full">Full screen</button>
     <script src="shop.js"></script>
@@ -70,9 +70,9 @@
       var bar = document.querySelector("#bar div");
       var config = {
         arguments: [],
-        dataUrl: "Build/9e1e80560a798f00548501154c27c741.data.unityweb",
+        dataUrl: "Build/a18533e976a7a521ac61cc6b9a73dcaa.data.unityweb",
         frameworkUrl: "Build/499c93c81a0cdf477c8771575a20b88b.framework.js.unityweb",
-        codeUrl: "Build/ddac71e2ee7fa0e7109bc2678811d96f.wasm.unityweb",
+        codeUrl: "Build/c27f2ef7a9b17db23e0d6535fb87d5cd.wasm.unityweb",
         streamingAssetsUrl: "StreamingAssets",
         companyName: "Yonatan Ohana",
         productName: "Off the Couch",
@@ -267,7 +267,7 @@
           config.codeUrl = full.code;
         }
         var loader = document.createElement("script");
-        loader.src = full ? full.loader : "Build/73855ac35a24dfcfe92c281b2b57e6dc.loader.js";
+        loader.src = full ? full.loader : "Build/32ee8a1229cdef05809c59ad9bb279f3.loader.js";
         loader.onerror = function () {
           document.querySelector("#loading p").textContent = "The games did not download. Check the internet and reload the page.";
         };
