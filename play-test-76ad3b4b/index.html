@@ -92,6 +92,15 @@
         awake();
         document.addEventListener("visibilitychange", awake);
         document.addEventListener("touchend", awake, { once: true }); // some phones only allow it after a touch
+        // Android phones: any touch fills the whole screen, held sideways (browsers only allow it right after a
+        // touch). iPhones cannot; there full screen comes from adding the page to the home screen (see the head).
+        document.addEventListener("pointerup", function () {
+          var page = document.documentElement;
+          if (document.fullscreenElement || !page.requestFullscreen) return;
+          page.requestFullscreen({ navigationUI: "hide" }).then(function () {
+            if (screen.orientation && screen.orientation.lock) return screen.orientation.lock("landscape");
+          }).catch(function () {});
+        }, true);
         watchReader();
       }
 
