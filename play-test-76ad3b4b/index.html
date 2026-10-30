@@ -44,6 +44,9 @@
         background: rgba(43, 45, 66, .7); color: #FFFFFF; font: 600 11px/1.35 ui-monospace, Menlo, monospace;
         pointer-events: none; white-space: pre; }
       body.phone #numbers { display: block; }
+      #full { display: none; position: fixed; left: 8px; top: 64px; z-index: 10; padding: 8px 16px;
+        border: 0; border-radius: 6px; background: #17847C; color: #FFFFFF; font: 700 15px -apple-system, system-ui, sans-serif; }
+      body.phone.can-fill #full { display: block; }
     </style>
   </head>
   <body>
@@ -60,6 +63,7 @@
     </div>
     <div id="turn">Turn your phone sideways to play</div>
     <div id="numbers"></div>
+    <button id="full">Full screen</button>
     <script src="shop.js"></script>
     <script>
       var bar = document.querySelector("#bar div");
@@ -92,15 +96,22 @@
         awake();
         document.addEventListener("visibilitychange", awake);
         document.addEventListener("touchend", awake, { once: true }); // some phones only allow it after a touch
-        // Android phones: any touch fills the whole screen, held sideways (browsers only allow it right after a
-        // touch). iPhones cannot; there full screen comes from adding the page to the home screen (see the head).
-        document.addEventListener("pointerup", function () {
+        // Android phones: any touch, or the "Full screen" button at the top, fills the whole screen, held sideways
+        // (browsers only allow it right after a touch). The button shows while the page is not full screen. iPhones
+        // cannot; there full screen comes from adding the page to the home screen (see the head).
+        var filling = false, fill = function () {
           var page = document.documentElement;
-          if (document.fullscreenElement || !page.requestFullscreen) return;
+          if (filling || document.fullscreenElement || !page.requestFullscreen) return;
+          filling = true;
           page.requestFullscreen({ navigationUI: "hide" }).then(function () {
             if (screen.orientation && screen.orientation.lock) return screen.orientation.lock("landscape");
-          }).catch(function () {});
-        }, true);
+          }).catch(function () {}).then(function () { filling = false; });
+        };
+        var showFull = function () { document.body.classList.toggle("can-fill", !!document.fullscreenEnabled && !document.fullscreenElement); };
+        showFull();
+        document.addEventListener("fullscreenchange", showFull);
+        document.getElementById("full").addEventListener("click", fill);
+        document.addEventListener("pointerup", fill, true);
         watchReader();
       }
 
