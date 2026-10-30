@@ -43,7 +43,7 @@
       #numbers { display: none; position: fixed; left: 8px; top: 8px; z-index: 10; padding: 4px 8px; border-radius: 4px;
         background: rgba(43, 45, 66, .7); color: #FFFFFF; font: 600 11px/1.35 ui-monospace, Menlo, monospace;
         pointer-events: none; white-space: pre; }
-      body.phone #numbers { display: block; }
+      body.phone #numbers, body.numbers #numbers { display: block; }
       #full { display: none; position: fixed; right: calc(27% + 12px); top: 12px; z-index: 10; padding: 7px 14px;
         border: 0; border-radius: 4px; background: #FFFFFF; color: #17847C; box-shadow: 3px 4px 0 rgba(43, 45, 66, .18);
         font: 700 14px -apple-system, system-ui, sans-serif; }
@@ -98,21 +98,31 @@
         document.addEventListener("visibilitychange", awake);
         document.addEventListener("touchend", awake, { once: true }); // some phones only allow it after a touch
         // Android phones: any touch, or the "Full screen" button at the top, fills the whole screen, held sideways
-        // (browsers only allow it right after a touch). The button shows while the page is not full screen. iPhones
-        // cannot; there full screen comes from adding the page to the home screen (see the head).
+        // (browsers only allow it right after a touch). Only once the camera is on: full screen hides the browser's
+        // "Allow camera?" box on iPads (owner, 2026-10-30). The button shows while the page is not full screen.
+        // iPhones cannot; there full screen comes from adding the page to the home screen (see the head).
+        var cameraOn = function () { return !!window.OTCReader && OTCReader.camera === 3; };
         var filling = false, fill = function () {
           var page = document.documentElement;
-          if (filling || document.fullscreenElement || !page.requestFullscreen) return;
+          if (filling || !cameraOn() || document.fullscreenElement || !page.requestFullscreen) return;
           filling = true;
           page.requestFullscreen({ navigationUI: "hide" }).then(function () {
             if (screen.orientation && screen.orientation.lock) return screen.orientation.lock("landscape");
           }).catch(function () {}).then(function () { filling = false; });
         };
-        var showFull = function () { document.body.classList.toggle("can-fill", !!document.fullscreenEnabled && !document.fullscreenElement); };
-        showFull();
+        var showFull = function () {
+          document.body.classList.toggle("can-fill", !!document.fullscreenEnabled && !document.fullscreenElement && cameraOn());
+        };
+        setInterval(showFull, 500);
         document.addEventListener("fullscreenchange", showFull);
         document.getElementById("full").addEventListener("click", fill);
         document.addEventListener("pointerup", fill, true);
+        watchReader();
+      }
+      // Trying other browsers on a computer (Safari, 2026-10-30): ?numbers shows the reader's numbers there too, and
+      // ?lite uses the lighter body model there, as phones do.
+      else if (new URLSearchParams(location.search).has("numbers")) {
+        document.body.classList.add("numbers");
         watchReader();
       }
 
@@ -122,7 +132,7 @@
       function watchReader() {
         var Real = window.Worker, count = { frames: 0, camera: 0, reads: 0, bodyMs: 0, wait: 0, hands: 0, handMs: 0 };
         var sent = [], since = performance.now(), video = null, slowest = 0;
-        var lite = !new URLSearchParams(location.search).has("full");
+        var asked = new URLSearchParams(location.search), lite = phone ? !asked.has("full") : asked.has("lite");
         window.Worker = function (url, options) {
           if (String(url).indexOf("reader-worker") < 0) return new Real(url, options);
           // The lighter body model (see reader-worker.js); ?full keeps the full one, for comparing.
