@@ -5,7 +5,14 @@
          paper, with a paper card and a bar while it loads. The shop (shop.js, in the website's look) decides which
          download to load: the free one, or every game for a signed-in buyer whose computer is the one playing. -->
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <!-- iPhones and iPads only (computers ignore these): the game also fills the strips beside the notch, and once
+         added to the home screen (Share, then "Add to Home Screen") it opens full screen without Safari's bars, the
+         only way Apple lets a website fill an iPhone's screen. -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Off the Couch">
+    <link rel="apple-touch-icon" href="home-icon.png">
     <meta name="robots" content="noindex"> <!-- a test page for now: kept out of search results -->
     <title>Off the Couch</title>
     <link rel="icon" type="image/png" href="favicon.png">
