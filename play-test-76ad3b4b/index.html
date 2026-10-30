@@ -29,6 +29,14 @@
       #chrome.phone #copy { background: none; color: #17847C; padding: 4px; text-decoration: underline; font-weight: 600; }
       #send { display: none; font: inherit; font-weight: 700; color: #FFFFFF; background: #17847C; border: 0;
         border-radius: 6px; padding: 12px 22px; cursor: pointer; }
+      /* Phones only (see "phone" below): a card while the phone is held upright, and the numbers in the corner */
+      #turn { display: none; position: fixed; inset: 0; z-index: 20; background: #FBF3E4; align-items: center;
+        justify-content: center; text-align: center; padding: 24px; font: 700 22px/1.4 -apple-system, system-ui, sans-serif; color: #17847C; }
+      @media (orientation: portrait) { body.phone #turn { display: flex; } }
+      #numbers { display: none; position: fixed; left: 8px; top: 8px; z-index: 10; padding: 4px 8px; border-radius: 4px;
+        background: rgba(43, 45, 66, .7); color: #FFFFFF; font: 600 11px/1.35 ui-monospace, Menlo, monospace;
+        pointer-events: none; white-space: pre; }
+      body.phone #numbers { display: block; }
     </style>
   </head>
   <body>
@@ -43,6 +51,8 @@
         <a id="get" href="https://www.google.com/chrome/" target="_blank" rel="noopener">Get Chrome</a>
       </div>
     </div>
+    <div id="turn">Turn your phone sideways to play</div>
+    <div id="numbers"></div>
     <script src="shop.js"></script>
     <script>
       var bar = document.querySelector("#bar div");
@@ -60,11 +70,78 @@
       var sharpness = new URLSearchParams(location.search).get("dpr");
       if (sharpness) config.devicePixelRatio = parseFloat(sharpness);
 
+      // Trying the games on phones (2026-10-30): ?phone lets a phone or tablet in. Only there, the game is drawn at
+      // most twice as sharp as the screen's points, the screen is kept awake (nothing is touched while playing), a card
+      // asks to hold the phone sideways, and the reader's numbers show in the corner. Computers get none of it.
+      var phone = new URLSearchParams(location.search).has("phone") && !!((navigator.userAgentData &&
+        navigator.userAgentData.mobile) || (navigator.maxTouchPoints > 1 && !matchMedia("(any-pointer: fine)").matches));
+      if (phone) {
+        document.body.classList.add("phone");
+        if (!sharpness) config.devicePixelRatio = Math.min(window.devicePixelRatio, 2);
+        var awake = function () {
+          if (navigator.wakeLock && document.visibilityState === "visible")
+            navigator.wakeLock.request("screen").catch(function () {});
+        };
+        awake();
+        document.addEventListener("visibilitychange", awake);
+        document.addEventListener("touchend", awake, { once: true }); // some phones only allow it after a touch
+        watchReader();
+      }
+
+      // Counts what the body reader does, from the messages between the page and the reader's own lane (see
+      // BrowserReader.jspre): reads a second, how long one takes, and how long after the picture was sent its answer
+      // came back. Shown every two seconds with the screen's and the camera's pictures a second.
+      function watchReader() {
+        var Real = window.Worker, count = { frames: 0, camera: 0, reads: 0, bodyMs: 0, wait: 0, hands: 0, handMs: 0 };
+        var sent = [], since = performance.now(), video = null, slowest = 0;
+        window.Worker = function (url, options) {
+          var worker = new Real(url, options);
+          if (String(url).indexOf("reader-worker") < 0) return worker;
+          var post = worker.postMessage;
+          worker.postMessage = function (message) {
+            if (message && message.kind === "read") sent.push(performance.now());
+            return post.apply(worker, arguments);
+          };
+          worker.addEventListener("message", function (event) {
+            if (event.data.kind !== "read" || !sent.length) return;
+            var wait = performance.now() - sent.shift();
+            count.reads++;
+            count.bodyMs += event.data.bodyMs;
+            count.wait += wait;
+            slowest = Math.max(slowest, wait);
+            if (event.data.handsRead) { count.hands++; count.handMs += event.data.handMs; }
+          });
+          return worker;
+        };
+        window.Worker.prototype = Real.prototype;
+        var frame = function () { count.frames++; requestAnimationFrame(frame); };
+        requestAnimationFrame(frame);
+        setInterval(function () {
+          var reader = window.OTCReader;
+          if (reader && reader.video && reader.video !== video && reader.video.requestVideoFrameCallback) {
+            video = reader.video;
+            var picture = function () { count.camera++; video.requestVideoFrameCallback(picture); };
+            video.requestVideoFrameCallback(picture);
+          }
+          var seconds = (performance.now() - since) / 1000, c = count, size = reader && reader.size();
+          var each = function (n) { return Math.round(n / seconds); }, average = function (ms, n) { return n ? Math.round(ms / n) : 0; };
+          document.getElementById("numbers").textContent =
+            "screen " + each(c.frames) + "/s  camera " + each(c.camera) + "/s" + (size ? " " + size[0] + "x" + size[1] : "") + "\n" +
+            "body " + each(c.reads) + "/s  read " + average(c.bodyMs, c.reads) + " ms  answer after " + average(c.wait, c.reads) +
+            " ms (slowest " + Math.round(slowest) + ")\n" +
+            "hands " + each(c.hands) + "/s  " + average(c.handMs, c.hands) + " ms  on the " + (reader ? reader.processor : "?") +
+            "  sharpness " + (config.devicePixelRatio || window.devicePixelRatio);
+          count = { frames: 0, camera: 0, reads: 0, bodyMs: 0, wait: 0, hands: 0, handMs: 0 };
+          since = performance.now();
+          slowest = 0;
+        }, 2000);
+      }
+
       // The body reading is only quick enough in Chrome and the browsers built on it (Edge, Brave, Arc, Opera) on a
       // computer: Safari was far too slow (owner, 2026-10-28), and phones and tablets may run out of memory. Any other
       // browser gets a card asking for Chrome instead of the game's download. ?anybrowser skips this, for trying others.
       var browser = navigator.userAgentData;
-      var playable = new URLSearchParams(location.search).has("anybrowser") || !!(browser && !browser.mobile &&
+      var playable = new URLSearchParams(location.search).has("anybrowser") || phone || !!(browser && !browser.mobile &&
         browser.platform !== "Android" && browser.brands.some(function (b) { return b.brand === "Chromium"; }));
       if (!playable) {
         document.querySelector("#loading p").textContent =
