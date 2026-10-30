@@ -70,9 +70,9 @@
       var bar = document.querySelector("#bar div");
       var config = {
         arguments: [],
-        dataUrl: "Build/a18533e976a7a521ac61cc6b9a73dcaa.data.unityweb",
-        frameworkUrl: "Build/499c93c81a0cdf477c8771575a20b88b.framework.js.unityweb",
-        codeUrl: "Build/c27f2ef7a9b17db23e0d6535fb87d5cd.wasm.unityweb",
+        dataUrl: "Build/30c107ce5298291c8639b47b6604161f.data.unityweb",
+        frameworkUrl: "Build/023bbfa8d8344146a229c8c2e864ace5.framework.js.unityweb",
+        codeUrl: "Build/0de2010dc499b7777e14acfdd0a89944.wasm.unityweb",
         streamingAssetsUrl: "StreamingAssets",
         companyName: "Yonatan Ohana",
         productName: "Off the Couch",
@@ -117,6 +117,8 @@
         document.addEventListener("fullscreenchange", showFull);
         document.getElementById("full").addEventListener("click", fill);
         document.addEventListener("pointerup", fill, true);
+        // The game drawn lighter (see TabletTuning.ApplyBrowser in the game); &fullgraphics keeps the computer's drawing.
+        if (!new URLSearchParams(location.search).has("fullgraphics")) window.OTCLightDrawing = true;
         // Smaller camera pictures (640x360 instead of 1280x720): each one is copied for the game's picture and for the
         // reader, and on an iPad those copies showed as freezes every few seconds (2026-10-30). The body reader
         // shrinks the picture anyway. &bigcamera keeps the full size, for comparing.
@@ -278,7 +280,7 @@
           config.codeUrl = full.code;
         }
         var loader = document.createElement("script");
-        loader.src = full ? full.loader : "Build/32ee8a1229cdef05809c59ad9bb279f3.loader.js";
+        loader.src = full ? full.loader : "Build/867fe7ab08417d9476b9b53f27e4b5bd.loader.js";
         loader.onerror = function () {
           document.querySelector("#loading p").textContent = "The games did not download. Check the internet and reload the page.";
         };
