@@ -117,6 +117,17 @@
         document.addEventListener("fullscreenchange", showFull);
         document.getElementById("full").addEventListener("click", fill);
         document.addEventListener("pointerup", fill, true);
+        // Smaller camera pictures (640x360 instead of 1280x720): each one is copied for the game's picture and for the
+        // reader, and on an iPad those copies showed as freezes every few seconds (2026-10-30). The body reader
+        // shrinks the picture anyway. &bigcamera keeps the full size, for comparing.
+        if (!new URLSearchParams(location.search).has("bigcamera") && navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+          var openCamera = navigator.mediaDevices.getUserMedia.bind(navigator.mediaDevices);
+          navigator.mediaDevices.getUserMedia = function (asked) {
+            if (asked && asked.video && typeof asked.video === "object")
+              asked = { audio: asked.audio, video: Object.assign({}, asked.video, { width: { ideal: 640 }, height: { ideal: 360 } }) };
+            return openCamera(asked);
+          };
+        }
         watchReader();
       }
       // Trying other browsers on a computer (Safari, 2026-10-30): ?numbers shows the reader's numbers there too, and
