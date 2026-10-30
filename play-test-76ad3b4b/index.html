@@ -44,8 +44,9 @@
         background: rgba(43, 45, 66, .7); color: #FFFFFF; font: 600 11px/1.35 ui-monospace, Menlo, monospace;
         pointer-events: none; white-space: pre; }
       body.phone #numbers { display: block; }
-      #full { display: none; position: fixed; left: 8px; top: 64px; z-index: 10; padding: 8px 16px;
-        border: 0; border-radius: 6px; background: #17847C; color: #FFFFFF; font: 700 15px -apple-system, system-ui, sans-serif; }
+      #full { display: none; position: fixed; right: calc(27% + 12px); top: 12px; z-index: 10; padding: 7px 14px;
+        border: 0; border-radius: 4px; background: #FFFFFF; color: #17847C; box-shadow: 3px 4px 0 rgba(43, 45, 66, .18);
+        font: 700 14px -apple-system, system-ui, sans-serif; }
       body.phone.can-fill #full { display: block; }
     </style>
   </head>
@@ -121,9 +122,11 @@
       function watchReader() {
         var Real = window.Worker, count = { frames: 0, camera: 0, reads: 0, bodyMs: 0, wait: 0, hands: 0, handMs: 0 };
         var sent = [], since = performance.now(), video = null, slowest = 0;
+        var lite = !new URLSearchParams(location.search).has("full");
         window.Worker = function (url, options) {
-          var worker = new Real(url, options);
-          if (String(url).indexOf("reader-worker") < 0) return worker;
+          if (String(url).indexOf("reader-worker") < 0) return new Real(url, options);
+          // The lighter body model (see reader-worker.js); ?full keeps the full one, for comparing.
+          var worker = new Real(lite ? url + "?lite" : url, options);
           var post = worker.postMessage;
           worker.postMessage = function (message) {
             if (message && message.kind === "read") sent.push(performance.now());
@@ -156,7 +159,7 @@
             "screen " + each(c.frames) + "/s  camera " + each(c.camera) + "/s" + (size ? " " + size[0] + "x" + size[1] : "") + "\n" +
             "body " + each(c.reads) + "/s  read " + average(c.bodyMs, c.reads) + " ms  answer after " + average(c.wait, c.reads) +
             " ms (slowest " + Math.round(slowest) + ")\n" +
-            "hands " + each(c.hands) + "/s  " + average(c.handMs, c.hands) + " ms  on the " + (reader ? reader.processor : "?") +
+            "hands " + each(c.hands) + "/s  " + average(c.handMs, c.hands) + " ms  " + (lite ? "light" : "full") + " body, on the " + (reader ? reader.processor : "?") +
             "  sharpness " + (config.devicePixelRatio || window.devicePixelRatio);
           count = { frames: 0, camera: 0, reads: 0, bodyMs: 0, wait: 0, hands: 0, handMs: 0 };
           since = performance.now();

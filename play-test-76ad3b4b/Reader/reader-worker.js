@@ -2,6 +2,9 @@
 // game's page sends each new camera picture here (see Assets/Plugins/WebGL/BrowserReader.jspre) and gets the body's
 // and hands' points back. The reader's files sit next to this one.
 var body = null, hands = null, lastStamp = 0;
+// Phones start this lane as reader-worker.js?lite (see the play page's phone part) for Google's lighter body model:
+// about half the work per read, a little less exact. Computers keep the full one.
+var bodyModel = self.location.search.indexOf("lite") >= 0 ? "pose_landmarker_lite.task" : "pose_landmarker_full.task";
 
 self.onmessage = function (event) {
   var message = event.data;
@@ -31,7 +34,7 @@ function load(base) {
 function make(vision, files, base, delegate) {
   return Promise.all([
     vision.PoseLandmarker.createFromOptions(files, {
-      baseOptions: { modelAssetPath: base + "pose_landmarker_full.task", delegate: delegate }, runningMode: "VIDEO", numPoses: 1 }),
+      baseOptions: { modelAssetPath: base + bodyModel, delegate: delegate }, runningMode: "VIDEO", numPoses: 1 }),
     vision.HandLandmarker.createFromOptions(files, {
       baseOptions: { modelAssetPath: base + "hand_landmarker.task", delegate: delegate }, runningMode: "VIDEO", numHands: 2 })
   ]).then(function (made) {
