@@ -14,14 +14,21 @@
 <link rel="icon" href="favicon.png">
 <link rel="preload" href="fonts/CaveatBrush-Regular.ttf" as="font" type="font/ttf" crossorigin>
 <link rel="stylesheet" href="style.css">
-<script>document.documentElement.classList.add('js');</script>
+<script>
+document.documentElement.classList.add('js');
+// Phones and tablets can't play (the play page says the same): they get the "send yourself the link" first screen.
+(function () {
+  var ua = navigator.userAgent, data = navigator.userAgentData;
+  var phone = (data && data.mobile) || /iPhone|iPad|iPod|Android/i.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1);
+  if (phone) document.documentElement.classList.add('phone');
+})();
+</script>
 </head>
 <body>
 <header class="top">
   <div class="wrap">
     <a class="brand" href="./"><img src="img/icon.png" alt="">Off the Couch</a>
     <nav aria-label="Main"><a href="#games">Games</a><a href="#how">How it works</a><a href="#price">Price</a><a href="#help">Help</a></nav>
-    <a class="signin" href="play/?signin">Sign in</a>
     <a class="btn btn-main btn-small" href="play/">Play free</a>
   </div>
 </header>
@@ -30,15 +37,27 @@
 <section class="hero">
   <video src="video/hero.mp4" poster="video/hero.jpg" autoplay muted loop playsinline></video>
   <div class="wrap hero-in">
-    <span class="now"><i></i>Playing <b id="now">Fruit Slicer</b></span>
-    <h1>Arcade for<br>your <span>body.</span></h1>
-    <p class="lead">Games you play with your whole body, using your camera. No controller, no headset: stand back, move, and the game follows you.</p>
-    <div class="ctas">
-      <a class="btn btn-main" href="play/"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24"><path d="M7 4l13 8-13 8z" fill="currentColor"/></svg>Play Fruit Slicer free</a>
+    <!-- On a computer: what it is, and one button. -->
+    <div class="for-computer">
+      <h1>Play arcade games<br>with your <span>whole body.</span></h1>
+      <p class="lead">Your webcam is the controller. Free in Chrome on your computer, no sign-up, nothing to install.</p>
+      <div class="ctas">
+        <a class="btn btn-main" href="play/"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24"><path d="M7 4l13 8-13 8z" fill="currentColor"/></svg>Play Fruit Slicer now</a>
+      </div>
+      <p class="fine">Stand back about 2 metres. The camera pictures never leave your computer.</p>
     </div>
-    <p class="fine">Plays right here in Google Chrome on a computer with a camera. Nothing to install.</p>
-    <div class="coming">Coming soon: <b>Mac App Store</b><b>App Store for iPad</b><b>Steam for Windows</b></div>
+    <!-- On a phone or tablet, which can't play: send yourself the link for the computer (see site.js). -->
+    <div class="for-phone">
+      <h1>Play this on your <span>computer.</span></h1>
+      <p class="lead">Arcade games you play with your whole body, using the webcam. Free in Chrome, no sign-up.</p>
+      <div class="ctas">
+        <button class="btn btn-main" type="button" id="send">Send me the link</button>
+      </div>
+      <button class="textlink" type="button" id="copy">Copy the link</button>
+      <p class="fine">Opens your email or messages, so you can play later on your computer.</p>
+    </div>
   </div>
+  <a class="hero-game" href="play/" aria-label="Play Fruit Slicer"><img src="img/hero-game.jpg" alt="Fruit Slicer: fruit flies across a paper landscape and splats when sliced" width="640" height="390"></a>
 </section>
 
 <div class="roll" aria-hidden="true"><div><span>Slice</span><span>Run</span><span>Fly</span><span>Ski</span><span>Save</span><span>Pose</span><span>Flap</span><span>Balance</span><span>Slice</span><span>Run</span><span>Fly</span><span>Ski</span><span>Save</span><span>Pose</span><span>Flap</span><span>Balance</span></div></div>
@@ -123,6 +142,7 @@
       <div class="place">Mac App Store <span class="soon">Coming soon</span></div>
       <div class="place">App Store for iPad <span class="soon">Coming soon</span></div>
       <div class="place">Steam for Windows <span class="soon">Coming soon</span></div>
+      <a class="signin-line" href="play/?signin">Already bought? Sign in</a>
       <p class="fine">Each place keeps its own purchase: buying in the browser opens the games in the browser.</p>
     </div>
   </div>
@@ -139,7 +159,7 @@
       <details><summary>The game can't see me.</summary><p>Stand where your whole upper body is in the camera picture, with good light in front of you, not behind you.</p></details>
       <details><summary>What do I need?</summary><p>Any computer with a camera and Google Chrome to play in the browser. Then about 2 metres of space.</p></details>
       <details><summary>The camera is off.</summary><p>In Chrome: click the icon at the left end of the address bar and turn on "Camera".</p></details>
-      <details><summary>I bought the games before.</summary><p>In the browser: choose "Sign in" at the top of this page, or "Already bought? Log in" on the game's menu, and sign in the way you did when you bought. In the Mac app: choose "Settings" on the menu, then "Restore purchase".</p></details>
+      <details><summary>I bought the games before.</summary><p>In the browser: choose "Already bought? Sign in" under the price on this page, or "Already bought? Log in" on the game's menu, and sign in the way you did when you bought. In the Mac app: choose "Settings" on the menu, then "Restore purchase".</p></details>
     </div>
   </div>
 </section>
@@ -148,7 +168,7 @@
 <footer class="foot">
   <div class="wrap">
     <a class="brand" href="./"><img src="img/icon.png" alt="">Off the Couch</a>
-    <a href="terms.html">Terms</a><a href="refunds.html">Refunds</a><a href="privacy.html">Privacy</a><a href="contact.html">Contact</a><a href="credits.html">Credits</a>
+    <a href="terms.html">Terms</a><a href="refunds.html">Refunds</a><a href="privacy.html">Privacy</a><a href="contact.html">Contact</a><a href="play/?signin">Sign in</a><a href="credits.html">Credits</a>
     <span class="by">Made by Cuz Games · <a href="mailto:support@cuzgames.com">support@cuzgames.com</a></span>
   </div>
 </footer>

@@ -19,17 +19,25 @@ function playWhileSeen(videos, threshold) {
   videos.forEach(v => io.observe(v));
 }
 
-// The first video shows each game in turn, an equal share of its length each, in the order of the cards below; the
-// label names the one on screen.
+// The first video shows each game in turn.
 const cards = [...document.querySelectorAll('.card:not(.more)')];
-const names = cards.map(c => c.querySelector('h3').textContent);
-const hero = document.querySelector('.hero > video'), now = document.getElementById('now');
+const hero = document.querySelector('.hero > video');
 if (REDUCE) hero.pause();
-hero.addEventListener('timeupdate', () => {
-  if (!hero.duration) return;
-  now.textContent = names[Math.min(names.length - 1, Math.floor(hero.currentTime / (hero.duration / names.length)))];
-});
 playWhileSeen([hero], 0);
+
+// On a phone: send yourself the link to the game, to open on a computer. The phone's own share menu (email, WhatsApp,
+// notes…); browsers inside apps such as Instagram have none, so a new email to themselves opens instead.
+const link = new URL('play/', location.href).href, note = 'Off the Couch: games you play with your body. Open on my computer in Chrome:';
+const send = document.getElementById('send'), copy = document.getElementById('copy');
+send.addEventListener('click', () => {
+  if (navigator.share) navigator.share({ title: 'Off the Couch', text: note, url: link })
+    .then(() => { send.textContent = 'Sent! Open it on your computer'; }, () => {});
+  else location.href = 'mailto:?subject=' + encodeURIComponent('Off the Couch: play on my computer') + '&body=' + encodeURIComponent(note + '\n' + link);
+});
+copy.addEventListener('click', () => {
+  navigator.clipboard.writeText(link).then(() => { copy.textContent = 'Copied: paste it into Chrome on your computer'; },
+    () => { copy.textContent = link; });
+});
 
 // Game cards: the game fills the card, and the player pops up in the corner while it plays.
 const setLive = (card, on) => {
