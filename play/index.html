@@ -234,22 +234,22 @@
         }, 2000);
       }
 
-      // The body reading is only quick enough in Chrome and the browsers built on it (Edge, Brave, Arc, Opera) on a
-      // computer: Safari was far too slow (owner, 2026-10-28), and phones and tablets may run out of memory. Any other
-      // browser gets a card asking for Chrome instead of the game's download. ?anybrowser skips this, for trying others.
-      var browser = navigator.userAgentData;
-      var playable = new URLSearchParams(location.search).has("anybrowser") || phone || !!(browser && !browser.mobile &&
+      // On a computer the games play in Chrome and the browsers built on it (Edge, Brave, Arc, Opera), and in Safari
+      // (too slow on 2026-10-28, fine with the reader as it is now: owner, 2026-10-30). Phones and tablets play (above).
+      // Any other browser gets a card asking for Chrome instead of the game's download. ?anybrowser skips this, for trying others.
+      var browser = navigator.userAgentData, safari = /^Apple/.test(navigator.vendor || "");
+      var playable = new URLSearchParams(location.search).has("anybrowser") || phone || safari || !!(browser && !browser.mobile &&
         browser.platform !== "Android" && browser.brands.some(function (b) { return b.brand === "Chromium"; }));
       if (!playable) {
         document.querySelector("#loading p").textContent =
-          "The games play in Google Chrome on a computer. Open this page there to play.";
+          "The games play in Chrome or Safari on a computer. Open this page there to play.";
         document.getElementById("bar").style.display = "none";
         document.getElementById("chrome").style.display = "flex";
         var link = location.origin + location.pathname;
         if ((browser && browser.mobile) || navigator.maxTouchPoints > 1) { // a phone or tablet: send the link to themselves, to open on a computer later
           document.getElementById("get").style.display = "none";
           document.querySelector("#loading p").textContent =
-            "The games play on a computer with a camera, in Google Chrome. Send yourself the link to play there.";
+            "The games play on a computer with a camera, in Chrome or Safari. Send yourself the link to play there.";
           document.getElementById("chrome").classList.add("phone");
           OTCShop.step("phone");
           var send = document.getElementById("send"), note = "Off the Couch: games you play with your body. Open on my computer in Chrome:";
