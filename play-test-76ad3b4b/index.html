@@ -43,7 +43,7 @@
       #numbers { display: none; position: fixed; left: 8px; top: 8px; z-index: 10; padding: 4px 8px; border-radius: 4px;
         background: rgba(43, 45, 66, .7); color: #FFFFFF; font: 600 11px/1.35 ui-monospace, Menlo, monospace;
         pointer-events: none; white-space: pre; }
-      body.phone #numbers, body.numbers #numbers { display: block; }
+      body.numbers #numbers { display: block; }
       #full { display: none; position: fixed; right: calc(27% + 12px); top: 12px; z-index: 10; padding: 7px 14px;
         border: 0; border-radius: 4px; background: #FFFFFF; color: #17847C; box-shadow: 3px 4px 0 rgba(43, 45, 66, .18);
         font: 700 14px -apple-system, system-ui, sans-serif; }
@@ -82,13 +82,14 @@
       var sharpness = new URLSearchParams(location.search).get("dpr");
       if (sharpness) config.devicePixelRatio = parseFloat(sharpness);
 
-      // Trying the games on phones (2026-10-30): ?phone lets a phone or tablet in. Only there, the game is drawn at
-      // most twice as sharp as the screen's points, the screen is kept awake (nothing is touched while playing), a card
-      // asks to hold the phone sideways, and the reader's numbers show in the corner. Computers get none of it.
-      var phone = new URLSearchParams(location.search).has("phone") && !!((navigator.userAgentData &&
-        navigator.userAgentData.mobile) || (navigator.maxTouchPoints > 1 && !matchMedia("(any-pointer: fine)").matches));
+      // Phones and tablets play too (owner, 2026-10-30). Only there, the game is drawn at most twice as sharp as the
+      // screen's points, the screen is kept awake (nothing is touched while playing), a card asks to hold the device
+      // sideways, and the rest below. ?numbers shows the reader's numbers in the corner. Computers get none of it.
+      var phone = !!((navigator.userAgentData && navigator.userAgentData.mobile) ||
+        (navigator.maxTouchPoints > 1 && !matchMedia("(any-pointer: fine)").matches));
       if (phone) {
         document.body.classList.add("phone");
+        if (new URLSearchParams(location.search).has("numbers")) document.body.classList.add("numbers");
         if (!sharpness) config.devicePixelRatio = Math.min(window.devicePixelRatio, 2);
         var awake = function () {
           if (navigator.wakeLock && document.visibilityState === "visible")

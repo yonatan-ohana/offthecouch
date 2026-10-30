@@ -25,20 +25,6 @@ const hero = document.querySelector('.hero > video');
 if (REDUCE) hero.pause();
 playWhileSeen([hero], 0);
 
-// On a phone: send yourself the link to the game, to open on a computer. The phone's own share menu (email, WhatsApp,
-// notes…); browsers inside apps such as Instagram have none, so a new email to themselves opens instead.
-const link = new URL('play/', location.href).href, note = 'Off the Couch: games you play with your body. Open on my computer in Chrome:';
-const send = document.getElementById('send'), copy = document.getElementById('copy');
-send.addEventListener('click', () => {
-  if (navigator.share) navigator.share({ title: 'Off the Couch', text: note, url: link })
-    .then(() => { send.textContent = 'Sent! Open it on your computer'; }, () => {});
-  else location.href = 'mailto:?subject=' + encodeURIComponent('Off the Couch: play on my computer') + '&body=' + encodeURIComponent(note + '\n' + link);
-});
-copy.addEventListener('click', () => {
-  navigator.clipboard.writeText(link).then(() => { copy.textContent = 'Copied: paste it into Chrome on your computer'; },
-    () => { copy.textContent = link; });
-});
-
 // Game cards: the game fills the card, and the player pops up in the corner while it plays.
 const setLive = (card, on) => {
   card.classList.toggle('live', on);

@@ -5,7 +5,14 @@
          paper, with a paper card and a bar while it loads. The shop (shop.js, in the website's look) decides which
          download to load: the free one, or every game for a signed-in buyer whose computer is the one playing. -->
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <!-- iPhones and iPads only (computers ignore these): the game also fills the strips beside the notch, and once
+         added to the home screen (Share, then "Add to Home Screen") it opens full screen without Safari's bars, the
+         only way Apple lets a website fill an iPhone's screen. -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Off the Couch">
+    <link rel="apple-touch-icon" href="home-icon.png">
     <meta name="robots" content="noindex"> <!-- a test page for now: kept out of search results -->
     <title>Off the Couch</title>
     <link rel="icon" type="image/png" href="favicon.png">
@@ -29,6 +36,18 @@
       #chrome.phone #copy { background: none; color: #17847C; padding: 4px; text-decoration: underline; font-weight: 600; }
       #send { display: none; font: inherit; font-weight: 700; color: #FFFFFF; background: #17847C; border: 0;
         border-radius: 6px; padding: 12px 22px; cursor: pointer; }
+      /* Phones only (see "phone" below): a card while the phone is held upright, and the numbers in the corner */
+      #turn { display: none; position: fixed; inset: 0; z-index: 20; background: #FBF3E4; align-items: center;
+        justify-content: center; text-align: center; padding: 24px; font: 700 22px/1.4 -apple-system, system-ui, sans-serif; color: #17847C; }
+      @media (orientation: portrait) { body.phone #turn { display: flex; } }
+      #numbers { display: none; position: fixed; left: 8px; top: 8px; z-index: 10; padding: 4px 8px; border-radius: 4px;
+        background: rgba(43, 45, 66, .7); color: #FFFFFF; font: 600 11px/1.35 ui-monospace, Menlo, monospace;
+        pointer-events: none; white-space: pre; }
+      body.numbers #numbers { display: block; }
+      #full { display: none; position: fixed; right: calc(27% + 12px); top: 12px; z-index: 10; padding: 7px 14px;
+        border: 0; border-radius: 4px; background: #FFFFFF; color: #17847C; box-shadow: 3px 4px 0 rgba(43, 45, 66, .18);
+        font: 700 14px -apple-system, system-ui, sans-serif; }
+      body.phone.can-fill #full { display: block; }
     </style>
   </head>
   <body>
@@ -43,14 +62,17 @@
         <a id="get" href="https://www.google.com/chrome/" target="_blank" rel="noopener">Get Chrome</a>
       </div>
     </div>
+    <div id="turn">Turn your device sideways to play</div>
+    <div id="numbers"></div>
+    <button id="full">Full screen</button>
     <script src="shop.js"></script>
     <script>
       var bar = document.querySelector("#bar div");
       var config = {
         arguments: [],
-        dataUrl: "Build/9e1e80560a798f00548501154c27c741.data.unityweb",
-        frameworkUrl: "Build/499c93c81a0cdf477c8771575a20b88b.framework.js.unityweb",
-        codeUrl: "Build/ddac71e2ee7fa0e7109bc2678811d96f.wasm.unityweb",
+        dataUrl: "Build/a0afd0468bdc8cef80c6dc670bdf621c.data.unityweb",
+        frameworkUrl: "Build/023bbfa8d8344146a229c8c2e864ace5.framework.js.unityweb",
+        codeUrl: "Build/0de2010dc499b7777e14acfdd0a89944.wasm.unityweb",
         streamingAssetsUrl: "StreamingAssets",
         companyName: "Yonatan Ohana",
         productName: "Off the Couch",
@@ -60,11 +82,163 @@
       var sharpness = new URLSearchParams(location.search).get("dpr");
       if (sharpness) config.devicePixelRatio = parseFloat(sharpness);
 
+      // Phones and tablets play too (owner, 2026-10-30). Only there, the game is drawn at most twice as sharp as the
+      // screen's points, the screen is kept awake (nothing is touched while playing), a card asks to hold the device
+      // sideways, and the rest below. ?numbers shows the reader's numbers in the corner. Computers get none of it.
+      var phone = !!((navigator.userAgentData && navigator.userAgentData.mobile) ||
+        (navigator.maxTouchPoints > 1 && !matchMedia("(any-pointer: fine)").matches));
+      if (phone) {
+        document.body.classList.add("phone");
+        if (new URLSearchParams(location.search).has("numbers")) document.body.classList.add("numbers");
+        if (!sharpness) config.devicePixelRatio = Math.min(window.devicePixelRatio, 2);
+        var awake = function () {
+          if (navigator.wakeLock && document.visibilityState === "visible")
+            navigator.wakeLock.request("screen").catch(function () {});
+        };
+        awake();
+        document.addEventListener("visibilitychange", awake);
+        document.addEventListener("touchend", awake, { once: true }); // some phones only allow it after a touch
+        // Android phones: any touch, or the "Full screen" button at the top, fills the whole screen, held sideways
+        // (browsers only allow it right after a touch). Only once the camera is on: full screen hides the browser's
+        // "Allow camera?" box on iPads (owner, 2026-10-30). The button shows while the page is not full screen.
+        // iPhones cannot; there full screen comes from adding the page to the home screen (see the head).
+        var cameraOn = function () { return !!window.OTCReader && OTCReader.camera === 3; };
+        var filling = false, fill = function () {
+          var page = document.documentElement;
+          if (filling || !cameraOn() || document.fullscreenElement || !page.requestFullscreen) return;
+          filling = true;
+          page.requestFullscreen({ navigationUI: "hide" }).then(function () {
+            if (screen.orientation && screen.orientation.lock) return screen.orientation.lock("landscape");
+          }).catch(function () {}).then(function () { filling = false; });
+        };
+        var showFull = function () {
+          document.body.classList.toggle("can-fill", !!document.fullscreenEnabled && !document.fullscreenElement && cameraOn());
+        };
+        setInterval(showFull, 500);
+        document.addEventListener("fullscreenchange", showFull);
+        document.getElementById("full").addEventListener("click", fill);
+        document.addEventListener("pointerup", fill, true);
+        // The game drawn lighter (see TabletTuning.ApplyBrowser in the game); &fullgraphics keeps the computer's drawing.
+        if (!new URLSearchParams(location.search).has("fullgraphics")) window.OTCLightDrawing = true;
+        // Smaller camera pictures (640x360 instead of 1280x720): each one is copied for the game's picture and for the
+        // reader, and on an iPad those copies showed as freezes every few seconds (2026-10-30). The body reader
+        // shrinks the picture anyway. &bigcamera keeps the full size, for comparing.
+        if (!new URLSearchParams(location.search).has("bigcamera") && navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+          var openCamera = navigator.mediaDevices.getUserMedia.bind(navigator.mediaDevices);
+          navigator.mediaDevices.getUserMedia = function (asked) {
+            if (asked && asked.video && typeof asked.video === "object")
+              asked = { audio: asked.audio, video: Object.assign({}, asked.video, { width: { ideal: 640 }, height: { ideal: 360 } }) };
+            return openCamera(asked);
+          };
+        }
+        watchReader();
+      }
+      // Trying other browsers on a computer (Safari, 2026-10-30): ?numbers shows the reader's numbers there too, and
+      // ?lite uses the lighter body model there, as phones do.
+      else if (new URLSearchParams(location.search).has("numbers")) {
+        document.body.classList.add("numbers");
+        watchReader();
+      }
+
+      // Counts what the body reader does, from the messages between the page and the reader's own lane (see
+      // BrowserReader.jspre): reads a second, how long one takes, and how long after the picture was sent its answer
+      // came back. Shown every two seconds with the screen's and the camera's pictures a second.
+      function watchReader() {
+        var Real = window.Worker, count = { frames: 0, camera: 0, reads: 0, bodyMs: 0, wait: 0, hands: 0, handMs: 0 };
+        var sent = [], since = performance.now(), video = null, slowest = 0;
+        var asked = new URLSearchParams(location.search), lite = phone ? !asked.has("full") : asked.has("lite");
+        window.Worker = function (url, options) {
+          if (String(url).indexOf("reader-worker") < 0) return new Real(url, options);
+          // The lighter body model (see reader-worker.js); ?full keeps the full one, for comparing.
+          var worker = new Real(lite ? url + "?lite" : url, options);
+          var post = worker.postMessage;
+          worker.postMessage = function (message) {
+            if (message && message.kind === "read") sent.push(performance.now());
+            return post.apply(worker, arguments);
+          };
+          worker.addEventListener("message", function (event) {
+            if (event.data.kind !== "read" || !sent.length) return;
+            var wait = performance.now() - sent.shift();
+            if (event.data.bodyRead !== false) {
+              count.reads++;
+              count.bodyMs += event.data.bodyMs;
+              count.wait += wait;
+              slowest = Math.max(slowest, wait);
+            }
+            if (event.data.handsRead) { count.hands++; count.handMs += event.data.handMs; }
+          });
+          return worker;
+        };
+        window.Worker.prototype = Real.prototype;
+        var hitches = 0, longest = 0, lastFrame = 0;
+        var frame = function (at) {
+          count.frames++;
+          if (lastFrame && at - lastFrame > 50) { hitches++; longest = Math.max(longest, at - lastFrame); }
+          lastFrame = at;
+          requestAnimationFrame(frame);
+        };
+        requestAnimationFrame(frame);
+
+        // While trying (2026-10-30), with &log: the same numbers, the screen's hitches and anything that goes wrong also
+        // go to the online program's live log (see /api/testlog there), to be read on the Mac while the owner plays.
+        var reporting = asked.has("log"), id = Math.random().toString(36).slice(2, 6), lines = [], starts = 1, Log = "https://api.cuzgames.com/api/testlog";
+        try { starts = Number(sessionStorage.getItem("otc-starts") || 0) + 1; sessionStorage.setItem("otc-starts", starts); } catch (e) {}
+        var log = function (line) { if (reporting) lines.push((performance.now() / 1000).toFixed(1) + "s " + line); };
+        var ship = function (last) {
+          if (!lines.length) return;
+          var body = JSON.stringify({ id: id, lines: lines.splice(0) });
+          if (last && navigator.sendBeacon) navigator.sendBeacon(Log, body);
+          else fetch(Log, { method: "POST", keepalive: true, headers: { "Content-Type": "text/plain" }, body: body }).catch(function () {});
+        };
+        log("start " + starts + " in this tab: " + navigator.userAgent + "; screen " + screen.width + "x" + screen.height + " x" +
+          window.devicePixelRatio + ", sharpness " + (config.devicePixelRatio || window.devicePixelRatio) + ", " + (lite ? "light" : "full") + " body");
+        if (reporting) ["error", "warn", "log"].forEach(function (kind) {
+          var real = console[kind];
+          console[kind] = function () {
+            var text = Array.prototype.map.call(arguments, String).join(" ");
+            if (kind !== "log" || text.charAt(0) === "[") log(kind + ": " + text.slice(0, 300));
+            return real.apply(console, arguments);
+          };
+        });
+        window.addEventListener("error", function (event) { log("page error: " + event.message); });
+        window.addEventListener("unhandledrejection", function (event) { log("unhandled: " + (event.reason && (event.reason.message || event.reason))); });
+        document.addEventListener("visibilitychange", function () { log("page " + document.visibilityState); ship(true); });
+        window.addEventListener("pagehide", function () { log("page closing"); ship(true); });
+        document.addEventListener("fullscreenchange", function () { log("full screen " + (document.fullscreenElement ? "on" : "off")); });
+        document.getElementById("unity-canvas").addEventListener("webglcontextlost", function () { log("GRAPHICS LOST"); ship(true); });
+        setInterval(function () {
+          var reader = window.OTCReader;
+          if (reader && reader.video && reader.video !== video && reader.video.requestVideoFrameCallback) {
+            video = reader.video;
+            var picture = function () { count.camera++; video.requestVideoFrameCallback(picture); };
+            video.requestVideoFrameCallback(picture);
+          }
+          var seconds = (performance.now() - since) / 1000, c = count, size = reader && reader.size();
+          var each = function (n) { return Math.round(n / seconds); }, average = function (ms, n) { return n ? Math.round(ms / n) : 0; };
+          document.getElementById("numbers").textContent =
+            "screen " + each(c.frames) + "/s  camera " + each(c.camera) + "/s" + (size ? " " + size[0] + "x" + size[1] : "") + "\n" +
+            "body " + each(c.reads) + "/s  read " + average(c.bodyMs, c.reads) + " ms  answer after " + average(c.wait, c.reads) +
+            " ms (slowest " + Math.round(slowest) + ")\n" +
+            "hands " + each(c.hands) + "/s  " + average(c.handMs, c.hands) + " ms  " + (lite ? "light" : "full") + " body, on the " + (reader ? reader.processor : "?") +
+            "  sharpness " + (config.devicePixelRatio || window.devicePixelRatio);
+          var game = window.OTCGame && window.OTCGame.Module;
+          log(document.getElementById("numbers").textContent.replace(/\n/g, " | ") + " | hitches " + hitches + " (longest " +
+            Math.round(longest) + " ms) | reader " + (reader ? reader.state : "-") + " camera " + (reader ? reader.camera : "-") +
+            (game && game.HEAP8 ? " | game memory " + Math.round(game.HEAP8.length / 1048576) + " MB" : ""));
+          ship(false);
+          count = { frames: 0, camera: 0, reads: 0, bodyMs: 0, wait: 0, hands: 0, handMs: 0 };
+          since = performance.now();
+          slowest = 0;
+          hitches = 0;
+          longest = 0;
+        }, 2000);
+      }
+
       // The body reading is only quick enough in Chrome and the browsers built on it (Edge, Brave, Arc, Opera) on a
       // computer: Safari was far too slow (owner, 2026-10-28), and phones and tablets may run out of memory. Any other
       // browser gets a card asking for Chrome instead of the game's download. ?anybrowser skips this, for trying others.
       var browser = navigator.userAgentData;
-      var playable = new URLSearchParams(location.search).has("anybrowser") || !!(browser && !browser.mobile &&
+      var playable = new URLSearchParams(location.search).has("anybrowser") || phone || !!(browser && !browser.mobile &&
         browser.platform !== "Android" && browser.brands.some(function (b) { return b.brand === "Chromium"; }));
       if (!playable) {
         document.querySelector("#loading p").textContent =
@@ -107,14 +281,15 @@
           config.codeUrl = full.code;
         }
         var loader = document.createElement("script");
-        loader.src = full ? full.loader : "Build/73855ac35a24dfcfe92c281b2b57e6dc.loader.js";
+        loader.src = full ? full.loader : "Build/867fe7ab08417d9476b9b53f27e4b5bd.loader.js";
         loader.onerror = function () {
           document.querySelector("#loading p").textContent = "The games did not download. Check the internet and reload the page.";
         };
         loader.onload = function () {
           createUnityInstance(document.querySelector("#unity-canvas"), config, function (progress) {
             bar.style.width = Math.round(100 * progress) + "%";
-          }).then(function () {
+          }).then(function (game) {
+            window.OTCGame = game; // for looking at it from the browser's console (and the phone test's numbers)
             document.getElementById("loading").remove();
             document.querySelector("#unity-canvas").focus(); // keys reach the game without a click first
           }).catch(function (message) {

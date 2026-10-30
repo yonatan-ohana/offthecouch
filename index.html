@@ -16,7 +16,7 @@
 <link rel="stylesheet" href="style.css">
 <script>
 document.documentElement.classList.add('js');
-// Phones and tablets can't play (the play page says the same): they get the "send yourself the link" first screen.
+// Phones and tablets: the page marks them, so the game's print beside the player is left out (it covers the text there).
 (function () {
   var ua = navigator.userAgent, data = navigator.userAgentData;
   var phone = (data && data.mobile) || /iPhone|iPad|iPod|Android/i.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1);
@@ -37,24 +37,14 @@ document.documentElement.classList.add('js');
 <section class="hero">
   <video src="video/hero.mp4" poster="video/hero.jpg" autoplay muted loop playsinline></video>
   <div class="wrap hero-in">
-    <!-- On a computer: what it is, and one button. -->
-    <div class="for-computer">
+    <!-- What it is, and one button: on a computer, phone or tablet. -->
+    <div>
       <h1>Play arcade games<br>with your <span>whole body.</span></h1>
-      <p class="lead">Your webcam is the controller. Free in Chrome on your computer, no sign-up, nothing to install.</p>
+      <p class="lead">Your camera is the controller. Free on your phone or tablet, or in Chrome on a computer. No sign-up, nothing to install.</p>
       <div class="ctas">
         <a class="btn btn-main" href="play/"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24"><path d="M7 4l13 8-13 8z" fill="currentColor"/></svg>Play Fruit Slicer now</a>
       </div>
-      <p class="fine">Stand back about 2 metres. The camera pictures never leave your computer.</p>
-    </div>
-    <!-- On a phone or tablet, which can't play: send yourself the link for the computer (see site.js). -->
-    <div class="for-phone">
-      <h1>Play this on your <span>computer.</span></h1>
-      <p class="lead">Arcade games you play with your whole body, using the webcam. Free in Chrome, no sign-up.</p>
-      <div class="ctas">
-        <button class="btn btn-main" type="button" id="send">Send me the link</button>
-      </div>
-      <button class="textlink" type="button" id="copy">Copy the link</button>
-      <p class="fine">Opens your email or messages, so you can play later on your computer.</p>
+      <p class="fine">Stand back about 2 metres. The camera pictures never leave your device.</p>
     </div>
   </div>
   <a class="hero-game" href="play/" aria-label="Play Fruit Slicer"><img src="img/hero-game.jpg" alt="Fruit Slicer: fruit flies across a paper landscape and splats when sliced" width="640" height="390"></a>
@@ -126,7 +116,7 @@ document.documentElement.classList.add('js');
   <div class="trust rise">
     <div><b>No controller</b><span>Just you and the camera you already have.</span></div>
     <div><b>Nothing to install</b><span>Fruit Slicer plays right in Chrome.</span></div>
-    <div><b>Your camera stays private</b><span>The pictures never leave your computer.</span></div>
+    <div><b>Your camera stays private</b><span>The pictures never leave your device.</span></div>
   </div>
 </section>
 
@@ -157,7 +147,7 @@ document.documentElement.classList.add('js');
     </div>
     <div class="rise">
       <details><summary>The game can't see me.</summary><p>Stand where your whole upper body is in the camera picture, with good light in front of you, not behind you.</p></details>
-      <details><summary>What do I need?</summary><p>Any computer with a camera and Google Chrome to play in the browser. Then about 2 metres of space.</p></details>
+      <details><summary>What do I need?</summary><p>A phone or tablet, or a computer with a camera and Google Chrome, to play in the browser. Then about 2 metres of space.</p></details>
       <details><summary>The camera is off.</summary><p>In Chrome: click the icon at the left end of the address bar and turn on "Camera".</p></details>
       <details><summary>I bought the games before.</summary><p>In the browser: choose "Already bought? Sign in" under the price on this page, or "Already bought? Log in" on the game's menu, and sign in the way you did when you bought. In the Mac app: choose "Settings" on the menu, then "Restore purchase".</p></details>
     </div>
