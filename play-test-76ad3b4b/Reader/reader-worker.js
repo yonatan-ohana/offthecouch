@@ -4,7 +4,12 @@
 var body = null, hands = null, lastStamp = 0;
 // Phones start this lane as reader-worker.js?lite (see the play page's phone part) for Google's lighter body model:
 // about half the work per read, a little less exact. Computers keep the full one.
-var bodyModel = self.location.search.indexOf("lite") >= 0 ? "pose_landmarker_lite.task" : "pose_landmarker_full.task";
+var light = self.location.search.indexOf("lite") >= 0;
+var bodyModel = light ? "pose_landmarker_lite.task" : "pose_landmarker_full.task";
+// There the graphics chip that reads also draws the game, and an iPad choked to one picture a second once the body
+// and both hands were read in every picture (2026-10-30). So on phones reads start at least 50 ms apart (20 a second
+// at most), and while the game wants fingers the body and the hands take turns, each answer carrying the last body.
+var lastRead = -1e9, handsTurn = false, lastBody = null;
 
 self.onmessage = function (event) {
   var message = event.data;
@@ -47,10 +52,20 @@ function make(vision, files, base, delegate) {
 // run 0-1 across the picture from the top left) and, when asked, up to two hands of 21 x (x, y, z). The picture is
 // let go of afterwards.
 function read(message) {
-  var at = stamp(), started = performance.now();
-  var result = body.detectForVideo(message.picture, at), points = result.landmarks[0], world = result.worldLandmarks[0];
-  var bodyOut = null;
-  if (points && world) {
+  if (light) {
+    var wait = lastRead + 50 - performance.now();
+    if (wait > 0) {
+      setTimeout(function () { read(message); }, wait);
+      return;
+    }
+    lastRead = performance.now();
+  }
+  handsTurn = light && message.hands && !handsTurn && !!lastBody;
+  var at = stamp(), started = performance.now(), bodyOut = null;
+  var result = handsTurn ? null : body.detectForVideo(message.picture, at);
+  var points = result && result.landmarks[0], world = result && result.worldLandmarks[0];
+  if (handsTurn) bodyOut = lastBody && lastBody.slice();
+  else if (points && world) {
     bodyOut = new Float32Array(198);
     for (var i = 0; i < 33; i++) {
       bodyOut[3 * i] = points[i].x;
@@ -61,8 +76,9 @@ function read(message) {
       bodyOut[99 + 3 * i + 2] = world[i].z;
     }
   }
-  var bodyMs = performance.now() - started, handMs = 0, handsOut = null, handCount = 0;
-  if (message.hands) {
+  if (light && !handsTurn) lastBody = bodyOut && bodyOut.slice();
+  var bodyMs = performance.now() - started, handMs = 0, handsOut = null, handCount = 0, handsRead = !!message.hands && (!light || handsTurn);
+  if (handsRead) {
     started = performance.now();
     var found = hands.detectForVideo(message.picture, at).landmarks;
     handMs = performance.now() - started;
@@ -79,8 +95,8 @@ function read(message) {
   var transfer = [];
   if (bodyOut) transfer.push(bodyOut.buffer);
   if (handsOut) transfer.push(handsOut.buffer);
-  self.postMessage({ kind: "read", body: bodyOut, hands: handsOut, handCount: handCount, handsRead: !!message.hands,
-                     bodyMs: bodyMs, handMs: handMs }, transfer);
+  self.postMessage({ kind: "read", body: bodyOut, hands: handsOut, handCount: handCount, handsRead: handsRead,
+                     bodyRead: !handsTurn, bodyMs: bodyMs, handMs: handMs }, transfer);
 }
 
 // Each read needs a later time than the last.

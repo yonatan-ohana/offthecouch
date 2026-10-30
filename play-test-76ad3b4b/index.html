@@ -145,10 +145,12 @@
           worker.addEventListener("message", function (event) {
             if (event.data.kind !== "read" || !sent.length) return;
             var wait = performance.now() - sent.shift();
-            count.reads++;
-            count.bodyMs += event.data.bodyMs;
-            count.wait += wait;
-            slowest = Math.max(slowest, wait);
+            if (event.data.bodyRead !== false) {
+              count.reads++;
+              count.bodyMs += event.data.bodyMs;
+              count.wait += wait;
+              slowest = Math.max(slowest, wait);
+            }
             if (event.data.handsRead) { count.hands++; count.handMs += event.data.handMs; }
           });
           return worker;
@@ -163,11 +165,11 @@
         };
         requestAnimationFrame(frame);
 
-        // While trying (2026-10-30): the same numbers, the screen's hitches and anything that goes wrong also go to the
-        // online program's live log (see /api/testlog there), to be read on the Mac while the owner plays.
-        var id = Math.random().toString(36).slice(2, 6), lines = [], starts = 1, Log = "https://api.cuzgames.com/api/testlog";
+        // While trying (2026-10-30), with &log: the same numbers, the screen's hitches and anything that goes wrong also
+        // go to the online program's live log (see /api/testlog there), to be read on the Mac while the owner plays.
+        var reporting = asked.has("log"), id = Math.random().toString(36).slice(2, 6), lines = [], starts = 1, Log = "https://api.cuzgames.com/api/testlog";
         try { starts = Number(sessionStorage.getItem("otc-starts") || 0) + 1; sessionStorage.setItem("otc-starts", starts); } catch (e) {}
-        var log = function (line) { lines.push((performance.now() / 1000).toFixed(1) + "s " + line); };
+        var log = function (line) { if (reporting) lines.push((performance.now() / 1000).toFixed(1) + "s " + line); };
         var ship = function (last) {
           if (!lines.length) return;
           var body = JSON.stringify({ id: id, lines: lines.splice(0) });
@@ -176,7 +178,7 @@
         };
         log("start " + starts + " in this tab: " + navigator.userAgent + "; screen " + screen.width + "x" + screen.height + " x" +
           window.devicePixelRatio + ", sharpness " + (config.devicePixelRatio || window.devicePixelRatio) + ", " + (lite ? "light" : "full") + " body");
-        ["error", "warn", "log"].forEach(function (kind) {
+        if (reporting) ["error", "warn", "log"].forEach(function (kind) {
           var real = console[kind];
           console[kind] = function () {
             var text = Array.prototype.map.call(arguments, String).join(" ");
