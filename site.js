@@ -56,6 +56,9 @@ else {
 // Counts a visit to the website, once per tab, with where it came from, and starts the visit's story for the owner's
 // list of visits (see cameFrom, visit and step in play/shop.js, which work the same way and share what is kept here
 // for the tab, so the play page goes on with the same story). Nothing about who is sent.
+// A visit counts only once someone is really there: the page on screen for 3 seconds, or a touch, scroll or click.
+// Apps such as TikTok load an ad's page early while the ad plays and drop it when the person swipes on; those, and
+// anyone gone within 3 seconds, count only as a "glance", with no story.
 (function countVisit() {
   try {
     if (sessionStorage.getItem('otcFrom') || /^(localhost|127\.0\.0\.1)$/.test(location.hostname)) return;
@@ -66,24 +69,54 @@ else {
     const from = /tiktok|musical_ly|bytedance|ttclid/.test(all) ? 'tiktok' : /instagram/.test(all) ? 'instagram' :
       /facebook|fban|fbav|fbclid/.test(all) ? 'facebook' : /youtube/.test(all) ? 'youtube' : /google|gclid/.test(all) ? 'google' :
       /itch\.io/.test(all) ? 'itch' : /bing|duckduckgo|yahoo|ecosia/.test(all) ? 'search' : ref ? 'site' : 'direct';
-    const visit = Math.random().toString(36).slice(2, 12), start = Date.now();
+    const visit = Math.random().toString(36).slice(2, 12);
     const device = /iPhone|iPad|Android|Mobi/.test(navigator.userAgent) || (/Macintosh/.test(navigator.userAgent) && navigator.maxTouchPoints > 1) ? 'phone' : 'computer';
+    let start = Date.now();
     sessionStorage.setItem('otcFrom', from);
     sessionStorage.setItem('otcVisit', visit);
     sessionStorage.setItem('otcStart', String(start));
-    const send = (step, game, detail, count) => fetch('https://api.cuzgames.com/api/step', { method: 'POST', keepalive: true,
-      headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify({ step, game, detail, count, from, visit, at: Date.now() - start, device }) }).catch(() => {});
-    send('site', '', '', true);
-    // Leaving the website without pressing Play: how long they looked (once; the play page tells its own end).
+    const send = (step, game, detail, count, story = true) => fetch('https://api.cuzgames.com/api/step', { method: 'POST', keepalive: true,
+      headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify({ step, game, detail, count, from, device,
+        ...(story ? { visit, at: Date.now() - start } : {}) }) }).catch(() => {});
+
+    // Someone is there: count the visit, its story starting from now.
+    let there = false, timer = 0;
+    const arrived = () => {
+      if (there || told) return;
+      there = true;
+      clearTimeout(timer);
+      start = Date.now();
+      sessionStorage.setItem('otcStart', String(start));
+      send('site', '', '', true);
+    };
+    const watch = () => {
+      clearTimeout(timer);
+      if (document.visibilityState === 'visible' && !document.prerendering) timer = setTimeout(arrived, 3000);
+    };
+    ['pointerdown', 'scroll', 'keydown'].forEach((type) => addEventListener(type, arrived, { once: true, passive: true, capture: true }));
+    document.addEventListener('visibilitychange', watch);
+    watch();
+
+    // Leaving the website without pressing Play: how long they looked (once; the play page tells its own end). Gone
+    // before anyone was there: a glance.
     let told = false;
     const left = () => {
       if (told) return;
+      if (!there) {
+        told = true;
+        send('glance', '', '', true, false);
+        return;
+      }
       told = true;
       const minutes = (Date.now() - start) / 60000;
       send('left', minutes < 1 ? 'under 1' : minutes < 3 ? '1-3' : minutes < 10 ? '3-10' : 'over 10', 'website', true);
     };
-    addEventListener('click', (e) => { if (e.target.closest && e.target.closest('a[href^="play/"]')) told = true; }, true);
+    addEventListener('click', (e) => {
+      if (!(e.target.closest && e.target.closest('a[href^="play/"]'))) return;
+      arrived();
+      told = true;
+    }, true);
     addEventListener('pagehide', left);
-    document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') left(); });
+    document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden' && there) left(); });
   } catch (e) {}
 })();
