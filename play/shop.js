@@ -208,11 +208,11 @@ var OTCShop = (function () {
   // the visit it happened and what the game said (detail). Nothing about who is sent: no internet address, no
   // account, no computer name, no camera picture.
 
-  var counted = {}, openedAt = Date.now(), told = 0;
+  var counted = {}, openedAt = Date.now(), told = 0, tester = notCounted();
   var ONCE = ["site", "page", "phone", "camera_on", "camera_refused", "camera_none", "person", "left"];
   function step(name, game, detail) {
     var key = name + "|" + (game || ""), first = !counted[key];
-    if (!API || (!first && ONCE.indexOf(name) >= 0) || ++told > 150) return;
+    if (!API || tester || (!first && ONCE.indexOf(name) >= 0) || ++told > 150) return;
     counted[key] = true;
     try {
       fetch(API + "/api/step", { method: "POST", keepalive: true, headers: { "Content-Type": "text/plain" },
@@ -221,6 +221,18 @@ var OTCShop = (function () {
     } catch (e) {}
   }
   function say(words) { step("say", "", words); }
+
+  // The owner's own devices and robots are not counted (owner, 2026-10-31): ?tester=on marks this device (?tester=off
+  // unmarks it), kept on the device; headless browsers (the checks run on the owner's Mac) never count. Same as the
+  // website's site.js.
+  function notCounted() {
+    try {
+      var asked = new URLSearchParams(location.search).get("tester");
+      if (asked === "on") localStorage.setItem("otcTester", "1");
+      if (asked === "off") localStorage.removeItem("otcTester");
+      return localStorage.getItem("otcTester") === "1" || navigator.webdriver || /HeadlessChrome/.test(navigator.userAgent);
+    } catch (e) { return false; }
+  }
 
   // This tab's visit: a made-up number and when it began (kept for the tab only, so the website's page and the play
   // page tell one story).
