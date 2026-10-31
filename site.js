@@ -59,16 +59,17 @@ else {
 // A visit counts only once someone is really there: the page on screen for 3 seconds, or a touch, scroll or click.
 // Apps such as TikTok load an ad's page early while the ad plays and drop it when the person swipes on; those, and
 // anyone gone within 3 seconds, count only as a "glance", with no story.
-// The owner's own devices and robots are not counted (owner, 2026-10-31: "make sure my test sessions are not
-// counted"): open any page once with ?tester=on to mark this device (?tester=off unmarks it); it stays marked on this
-// device and browser. Headless browsers (the checks run on this Mac) are never counted. play/shop.js does the same.
-function notCounted() {
+// The owner's tests are counted apart, as coming from "test" (owner, 2026-10-31: "make sure my test sessions are not
+// counted... toggle it in the analytics"; the numbers page hides them unless its Tests switch is on): open any page once
+// with ?tester=on to mark this device (?tester=off unmarks it); it stays marked on this device and browser. Headless
+// browsers (the checks run on this Mac) count as tests too. play/shop.js does the same.
+function isTest() {
   try {
     const asked = new URLSearchParams(location.search).get('tester');
     if (asked === 'on' || asked === 'off') {
       if (asked === 'on') localStorage.setItem('otcTester', '1'); else localStorage.removeItem('otcTester');
       const note = document.createElement('div');
-      note.textContent = asked === 'on' ? 'This device is not counted' : 'This device is counted again';
+      note.textContent = asked === 'on' ? 'This device counts as a test' : 'This device counts as a visitor again';
       note.style.cssText = 'position:fixed;left:50%;top:16px;transform:translateX(-50%);z-index:99;padding:8px 18px;border-radius:20px;background:#FFC93C;color:#2B1D4A;font:800 15px system-ui,sans-serif';
       const show = () => { document.body.appendChild(note); setTimeout(() => note.remove(), 4000); };
       if (document.body) show(); else addEventListener('DOMContentLoaded', show);
@@ -79,12 +80,13 @@ function notCounted() {
 
 (function countVisit() {
   try {
-    if (notCounted() || sessionStorage.getItem('otcFrom') || /^(localhost|127\.0\.0\.1)$/.test(location.hostname)) return;
+    const test = isTest();
+    if (sessionStorage.getItem('otcFrom') || /^(localhost|127\.0\.0\.1)$/.test(location.hostname)) return;
     let ref = '';
     try { ref = document.referrer ? new URL(document.referrer).hostname : ''; } catch (e) {}
     if (/(^|\.)(cuzgames|yo-software)\.com$/.test(ref)) ref = '';
     const all = (location.search + ' ' + ref + ' ' + navigator.userAgent).toLowerCase();
-    const from = /tiktok|musical_ly|bytedance|ttclid/.test(all) ? 'tiktok' : /instagram/.test(all) ? 'instagram' :
+    const from = test ? 'test' : /tiktok|musical_ly|bytedance|ttclid/.test(all) ? 'tiktok' : /instagram/.test(all) ? 'instagram' :
       /facebook|fban|fbav|fbclid/.test(all) ? 'facebook' : /youtube/.test(all) ? 'youtube' : /google|gclid/.test(all) ? 'google' :
       /itch\.io/.test(all) ? 'itch' : /bing|duckduckgo|yahoo|ecosia/.test(all) ? 'search' : ref ? 'site' : 'direct';
     const visit = Math.random().toString(36).slice(2, 12);

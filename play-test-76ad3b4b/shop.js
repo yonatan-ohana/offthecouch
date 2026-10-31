@@ -208,7 +208,7 @@ var OTCShop = (function () {
   // the visit it happened and what the game said (detail). Nothing about who is sent: no internet address, no
   // account, no computer name, no camera picture.
 
-  var counted = {}, openedAt = Date.now(), told = 0;
+  var counted = {}, openedAt = Date.now(), told = 0, tester = isTest();
   var ONCE = ["site", "page", "phone", "camera_on", "camera_refused", "camera_none", "person", "left"];
   function step(name, game, detail) {
     var key = name + "|" + (game || ""), first = !counted[key];
@@ -221,6 +221,20 @@ var OTCShop = (function () {
     } catch (e) {}
   }
   function say(words) { step("say", "", words); }
+
+  // The owner's tests are counted apart, as coming from "test" (owner, 2026-10-31: kept out of the numbers unless the
+  // numbers page's Tests switch shows them): a device marked with ?tester=on (?tester=off unmarks it; kept on the
+  // device), the hidden test page, and headless browsers (the checks run on the owner's Mac). Same as the website's
+  // site.js.
+  function isTest() {
+    try {
+      var asked = new URLSearchParams(location.search).get("tester");
+      if (asked === "on") localStorage.setItem("otcTester", "1");
+      if (asked === "off") localStorage.removeItem("otcTester");
+      return localStorage.getItem("otcTester") === "1" || /\/play-test/.test(location.pathname) || navigator.webdriver ||
+        /HeadlessChrome/.test(navigator.userAgent);
+    } catch (e) { return false; }
+  }
 
   // This tab's visit: a made-up number and when it began (kept for the tab only, so the website's page and the play
   // page tell one story).
@@ -246,6 +260,7 @@ var OTCShop = (function () {
   // same, see site.js) and kept for the tab: the app it was opened in (TikTok's and Instagram's own browsers say so),
   // the ad's or link's mark in the address, or the website that linked here.
   function cameFrom() {
+    if (tester) return "test";
     try { var kept = sessionStorage.getItem("otcFrom"); if (kept) return kept; } catch (e) {}
     var ref = "";
     try { ref = document.referrer ? new URL(document.referrer).hostname : ""; } catch (e) {}
