@@ -52,3 +52,21 @@ else {
   }), { threshold: 0.15 });
   parts.forEach(p => io.observe(p));
 }
+
+// Counts a visit to the website, once per tab, with where it came from (see cameFrom in play/shop.js, which works it
+// out the same way and keeps it for the tab, so the play page knows too). Nothing about who is sent.
+(function countVisit() {
+  try {
+    if (sessionStorage.getItem('otcFrom') || /^(localhost|127\.0\.0\.1)$/.test(location.hostname)) return;
+    let ref = '';
+    try { ref = document.referrer ? new URL(document.referrer).hostname : ''; } catch (e) {}
+    if (/(^|\.)(cuzgames|yo-software)\.com$/.test(ref)) ref = '';
+    const all = (location.search + ' ' + ref + ' ' + navigator.userAgent).toLowerCase();
+    const from = /tiktok|musical_ly|bytedance|ttclid/.test(all) ? 'tiktok' : /instagram/.test(all) ? 'instagram' :
+      /facebook|fban|fbav|fbclid/.test(all) ? 'facebook' : /youtube/.test(all) ? 'youtube' : /google|gclid/.test(all) ? 'google' :
+      /itch\.io/.test(all) ? 'itch' : /bing|duckduckgo|yahoo|ecosia/.test(all) ? 'search' : ref ? 'site' : 'direct';
+    sessionStorage.setItem('otcFrom', from);
+    fetch('https://api.cuzgames.com/api/step', { method: 'POST', keepalive: true, headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify({ step: 'site', game: '', from }) }).catch(() => {});
+  } catch (e) {}
+})();
