@@ -70,9 +70,9 @@
       var bar = document.querySelector("#bar div");
       var config = {
         arguments: [],
-        dataUrl: "Build/99082eda66545ffdc9ff10c20ab42448.data.unityweb",
-        frameworkUrl: "Build/023bbfa8d8344146a229c8c2e864ace5.framework.js.unityweb",
-        codeUrl: "Build/30ed09769579fa140ded302d0bb9f8cd.wasm.unityweb",
+        dataUrl: "Build/465f1967ef10137c5e5fc54ba16971bb.data.unityweb",
+        frameworkUrl: "Build/c38ba4a7f3643313c6b5f7c6a0d4e409.framework.js.unityweb",
+        codeUrl: "Build/bc65cb690a96636246d4baae50bcd930.wasm.unityweb",
         streamingAssetsUrl: "StreamingAssets",
         companyName: "Yonatan Ohana",
         productName: "Off the Couch",
@@ -281,7 +281,7 @@
           config.codeUrl = full.code;
         }
         var loader = document.createElement("script");
-        loader.src = full ? full.loader : "Build/0865893ee4bacc8cf12739ab5a70dc9a.loader.js";
+        loader.src = full ? full.loader : "Build/553416fd3b7f1af51d34a9c536c22a71.loader.js";
         loader.onerror = function () {
           document.querySelector("#loading p").textContent = "The games did not download. Check the internet and reload the page.";
         };
@@ -299,5 +299,7 @@
         document.body.appendChild(loader);
       }
     </script>
-  </body>
+  <!-- Counts visits without cookies (Cloudflare Web Analytics; see privacy.html) -->
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "4d95f0af11d34ae38b83c5156d64a12b"}'></script>
+</body>
 </html>

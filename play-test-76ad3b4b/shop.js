@@ -124,7 +124,12 @@ var OTCShop = (function () {
   // ---- Starting the page: the full download for a signed-in buyer whose computer gets the turn, else the free one
 
   function start(go) {
+    var firstPage = true;
+    try { firstPage = !sessionStorage.getItem("otcFrom"); } catch (e) {}
+    if (firstPage) step("site");
     step("page");
+    addEventListener("pagehide", stayed);
+    document.addEventListener("visibilitychange", function () { if (document.visibilityState === "hidden") stayed(); });
     watchReader();
     play = go;
     var asked = /[?&](stopped|playhere)\b/.exec(location.search);
@@ -197,18 +202,69 @@ var OTCShop = (function () {
     });
   }
 
-  // ---- How far players get (see /api/step in the online program): each step counted once per visit, as a total
-  // only. Nothing about who is sent: no internet address, no account, no computer name, no camera picture.
+  // ---- How far players get (see /api/step in the online program). Each step goes into the day's totals once per
+  // visit, with where the visit came from (a word like "tiktok", see cameFrom); and, for the owner's list of visits,
+  // every step goes into this visit's story, under a made-up visit number kept only for this tab, with how long into
+  // the visit it happened and what the game said (detail). Nothing about who is sent: no internet address, no
+  // account, no computer name, no camera picture.
 
-  var counted = {};
-  function step(name, game) {
-    var key = name + "|" + (game || "");
-    if (!API || counted[key]) return;
+  var counted = {}, openedAt = Date.now(), told = 0;
+  var ONCE = ["site", "page", "phone", "camera_on", "camera_refused", "camera_none", "person", "left"];
+  function step(name, game, detail) {
+    var key = name + "|" + (game || ""), first = !counted[key];
+    if (!API || (!first && ONCE.indexOf(name) >= 0) || ++told > 150) return;
     counted[key] = true;
     try {
       fetch(API + "/api/step", { method: "POST", keepalive: true, headers: { "Content-Type": "text/plain" },
-        body: JSON.stringify({ step: name, game: game || "" }) }).catch(function () {});
+        body: JSON.stringify({ step: name, game: game || "", detail: detail || "", count: first && name !== "say", from: cameFrom(),
+          visit: visit(), at: Date.now() - visitStart(), device: device() }) }).catch(function () {});
     } catch (e) {}
+  }
+  function say(words) { step("say", "", words); }
+
+  // This tab's visit: a made-up number and when it began (kept for the tab only, so the website's page and the play
+  // page tell one story).
+  function visit() {
+    try {
+      var id = sessionStorage.getItem("otcVisit");
+      if (!id) {
+        id = Math.random().toString(36).slice(2, 12);
+        sessionStorage.setItem("otcVisit", id);
+        sessionStorage.setItem("otcStart", String(openedAt));
+      }
+      return id;
+    } catch (e) { return ""; }
+  }
+  function visitStart() {
+    try { return +sessionStorage.getItem("otcStart") || openedAt; } catch (e) { return openedAt; }
+  }
+  function device() {
+    return /iPhone|iPad|Android|Mobi/.test(navigator.userAgent) || (/Macintosh/.test(navigator.userAgent) && navigator.maxTouchPoints > 1) ? "phone" : "computer";
+  }
+
+  // Where this visit came from, worked out on the first page of the site opened in this tab (the home page does the
+  // same, see site.js) and kept for the tab: the app it was opened in (TikTok's and Instagram's own browsers say so),
+  // the ad's or link's mark in the address, or the website that linked here.
+  function cameFrom() {
+    try { var kept = sessionStorage.getItem("otcFrom"); if (kept) return kept; } catch (e) {}
+    var ref = "";
+    try { ref = document.referrer ? new URL(document.referrer).hostname : ""; } catch (e) {}
+    if (/(^|\.)(cuzgames|yo-software)\.com$/.test(ref)) ref = "";
+    var all = (location.search + " " + ref + " " + navigator.userAgent).toLowerCase(), from =
+      /tiktok|musical_ly|bytedance|ttclid/.test(all) ? "tiktok" : /instagram/.test(all) ? "instagram" :
+      /facebook|fban|fbav|fbclid/.test(all) ? "facebook" : /youtube/.test(all) ? "youtube" : /google|gclid/.test(all) ? "google" :
+      /itch\.io/.test(all) ? "itch" : /bing|duckduckgo|yahoo|ecosia/.test(all) ? "search" : ref ? "site" : "direct";
+    try { sessionStorage.setItem("otcFrom", from); } catch (e) {}
+    return from;
+  }
+
+  // How long the visit lasted, counted once as it ends: the tab closed, or put away (a phone going back to the app).
+  var left = false;
+  function stayed() {
+    if (left) return;
+    left = true;
+    var minutes = (Date.now() - openedAt) / 60000;
+    step("left", minutes < 1 ? "under 1" : minutes < 3 ? "1-3" : minutes < 10 ? "3-10" : "over 10");
   }
 
   // Once the game is loading: the camera's answer and the first time the body reader sees someone, read from the
@@ -267,6 +323,7 @@ var OTCShop = (function () {
   function takeAnswer() {
     var given = answer;
     answer = 0;
+    if (given) say(given === 1 ? "bought the games!" : given === 2 ? "closed the unlock window without buying" : "the unlock window had a problem");
     return given;
   }
 
@@ -810,5 +867,5 @@ var OTCShop = (function () {
     return /^[1-9]\d{7,14}$/.test(number) ? "+" + number : null;
   }
 
-  return { start: start, buy: buy, account: account, takeAnswer: takeAnswer, step: step };
+  return { start: start, buy: buy, account: account, takeAnswer: takeAnswer, step: step, say: say };
 })();
