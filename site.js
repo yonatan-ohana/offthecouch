@@ -53,8 +53,9 @@ else {
   parts.forEach(p => io.observe(p));
 }
 
-// Counts a visit to the website, once per tab, with where it came from (see cameFrom in play/shop.js, which works it
-// out the same way and keeps it for the tab, so the play page knows too). Nothing about who is sent.
+// Counts a visit to the website, once per tab, with where it came from, and starts the visit's story for the owner's
+// list of visits (see cameFrom, visit and step in play/shop.js, which work the same way and share what is kept here
+// for the tab, so the play page goes on with the same story). Nothing about who is sent.
 (function countVisit() {
   try {
     if (sessionStorage.getItem('otcFrom') || /^(localhost|127\.0\.0\.1)$/.test(location.hostname)) return;
@@ -65,8 +66,24 @@ else {
     const from = /tiktok|musical_ly|bytedance|ttclid/.test(all) ? 'tiktok' : /instagram/.test(all) ? 'instagram' :
       /facebook|fban|fbav|fbclid/.test(all) ? 'facebook' : /youtube/.test(all) ? 'youtube' : /google|gclid/.test(all) ? 'google' :
       /itch\.io/.test(all) ? 'itch' : /bing|duckduckgo|yahoo|ecosia/.test(all) ? 'search' : ref ? 'site' : 'direct';
+    const visit = Math.random().toString(36).slice(2, 12), start = Date.now();
+    const device = /iPhone|iPad|Android|Mobi/.test(navigator.userAgent) || (/Macintosh/.test(navigator.userAgent) && navigator.maxTouchPoints > 1) ? 'phone' : 'computer';
     sessionStorage.setItem('otcFrom', from);
-    fetch('https://api.cuzgames.com/api/step', { method: 'POST', keepalive: true, headers: { 'Content-Type': 'text/plain' },
-      body: JSON.stringify({ step: 'site', game: '', from }) }).catch(() => {});
+    sessionStorage.setItem('otcVisit', visit);
+    sessionStorage.setItem('otcStart', String(start));
+    const send = (step, game, detail, count) => fetch('https://api.cuzgames.com/api/step', { method: 'POST', keepalive: true,
+      headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify({ step, game, detail, count, from, visit, at: Date.now() - start, device }) }).catch(() => {});
+    send('site', '', '', true);
+    // Leaving the website without pressing Play: how long they looked (once; the play page tells its own end).
+    let told = false;
+    const left = () => {
+      if (told) return;
+      told = true;
+      const minutes = (Date.now() - start) / 60000;
+      send('left', minutes < 1 ? 'under 1' : minutes < 3 ? '1-3' : minutes < 10 ? '3-10' : 'over 10', 'website', true);
+    };
+    addEventListener('click', (e) => { if (e.target.closest && e.target.closest('a[href^="play/"]')) told = true; }, true);
+    addEventListener('pagehide', left);
+    document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') left(); });
   } catch (e) {}
 })();
