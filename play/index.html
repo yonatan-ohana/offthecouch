@@ -89,9 +89,9 @@
       var bar = document.querySelector("#bar div");
       var config = {
         arguments: [],
-        dataUrl: "Build/e301f21a242c9742bbfb67c8c416bbf9.data.unityweb",
-        frameworkUrl: "Build/e04bd2f63243e046494dfcfe81437520.framework.js.unityweb",
-        codeUrl: "Build/0e23d1078b44e1c889c3c59e417cd054.wasm.unityweb",
+        dataUrl: "Build/968e5dc421e8ad7839a223b5ad96ae92.data.unityweb",
+        frameworkUrl: "Build/85d630e45c9c09e9e37f2291895e9c9f.framework.js.unityweb",
+        codeUrl: "Build/aa39172b2a96a20911ca46e68c474cd8.wasm.unityweb",
         streamingAssetsUrl: "StreamingAssets",
         companyName: "Yonatan Ohana",
         productName: "Off the Couch",
@@ -300,7 +300,7 @@
           config.codeUrl = full.code;
         }
         var loader = document.createElement("script");
-        loader.src = full ? full.loader : "Build/fe6a406bf466b6bd6fed8e1f0e7527af.loader.js";
+        loader.src = full ? full.loader : "Build/af6e9679ce905fc18b1ae3bd282af79c.loader.js";
         loader.onerror = function () {
           document.querySelector("#loading p").textContent = "The games did not download. Check the internet and reload the page.";
         };
