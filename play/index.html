@@ -130,11 +130,15 @@
     <script src="shop.js"></script>
     <script>
       var bar = document.querySelector("#bar div");
+      // The free game's files come from the online program's storage (see /api/free there, 2026-11-02: the website sent
+      // the 45 MB game file at about 50 KB a second). They are uploaded there with each new version. If that fails, the
+      // website's own copy in Build/.
+      var Files = "https://api.cuzgames.com/api/free/build/";
       var config = {
         arguments: [],
-        dataUrl: "Build/8667fd51e80a92f1bd0f50676cf124c3.data.unityweb",
-        frameworkUrl: "Build/88535c4844bb77b0067ef335b9d5ad8f.framework.js.unityweb",
-        codeUrl: "Build/ed3494e6760285f9dbd719f2d5af8995.wasm.unityweb",
+        dataUrl: Files + "8667fd51e80a92f1bd0f50676cf124c3.data.unityweb",
+        frameworkUrl: Files + "88535c4844bb77b0067ef335b9d5ad8f.framework.js.unityweb",
+        codeUrl: Files + "ed3494e6760285f9dbd719f2d5af8995.wasm.unityweb",
         streamingAssetsUrl: "StreamingAssets",
         companyName: "Yonatan Ohana",
         productName: "Off the Couch",
@@ -468,8 +472,16 @@
           config.codeUrl = full.code;
         }
         var loader = document.createElement("script");
-        loader.src = full ? full.loader : "Build/af56fd9997a69b32fc5dab4472d87c7f.loader.js";
+        loader.src = full ? full.loader : Files + "af56fd9997a69b32fc5dab4472d87c7f.loader.js";
         loader.onerror = function () {
+          if (!full && Files !== "Build/") { // the website's own copy instead
+            ["dataUrl", "frameworkUrl", "workerUrl", "codeUrl", "symbolsUrl"].forEach(function (part) {
+              if (config[part]) config[part] = config[part].replace(Files, "Build/");
+            });
+            loader.remove();
+            Files = "Build/";
+            return play(full);
+          }
           document.querySelector("#loading p").textContent = "The games did not download. Check the internet and reload the page.";
           document.body.classList.add("failed");
         };

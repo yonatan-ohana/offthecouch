@@ -13,11 +13,15 @@ var lastRead = -1e9, handsTurn = false, lastBody = null;
 
 self.onmessage = function (event) {
   var message = event.data;
-  if (message.kind === "load") load(message.base);
+  if (message.kind === "load") load(Fast, message.base);
   else if (message.kind === "read") read(message);
 };
 
-function load(base) {
+// The reader's files come from the online program's storage (2026-11-02: the website sent big files very slowly); the
+// copy beside this file if that fails.
+var Fast = "https://api.cuzgames.com/api/free/reader/";
+
+function load(base, instead) {
   import(base + "vision_bundle.mjs").then(function (vision) {
     return vision.FilesetResolver.forVisionTasks(base + "wasm").then(function (files) {
       return make(vision, files, base, "GPU").then(function () { return "graphics chip"; }, function (error) {
@@ -32,6 +36,10 @@ function load(base) {
     hands.detectForVideo(blank, stamp());
     self.postMessage({ kind: "ready", processor: processor, warmMs: performance.now() - started });
   }, function (error) {
+    if (instead) {
+      console.warn("[Browser] the reader's files did not come from storage, using the page's own:", error);
+      return load(instead);
+    }
     self.postMessage({ kind: "failed", error: String(error) });
   });
 }
