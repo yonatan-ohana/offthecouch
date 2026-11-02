@@ -356,7 +356,7 @@ var OTCShop = (function () {
   function giveawayWindow(count) {
     var take = function () {
       show(waitWindow("Opening the games…"));
-      call("/api/giveaway", { from: cameFrom() }).then(function (r) {
+      call("/api/giveaway", { from: cameFrom(), visit: visit() }).then(function (r) {
         me = r.account;
         say("took a free copy");
         show(doneWindow(true));
