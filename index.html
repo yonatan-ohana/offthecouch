@@ -39,6 +39,7 @@ document.documentElement.classList.add('js');
   <div class="wrap hero-in">
     <!-- Straight to the point: play now, on any screen, with one big glowing button (owner's mix of three drafts, 2026-10-30). -->
     <div>
+      <a class="launch" href="#price" data-launch>Launch price: all games <b>$3.99</b> <s>$7.99</s> until 15 November</a>
       <h1><span>Play now.</span><br>No app. No controller.</h1>
       <p class="lead">Wave, duck and jump in front of your camera. Right in your browser, Chrome or Safari.</p>
       <div class="screens">
@@ -128,11 +129,12 @@ document.documentElement.classList.add('js');
   <div class="price rise">
     <div class="say">
       <p class="kicker">One price, paid once</p>
-      <h2>All games <span>$7.99</span></h2>
+      <h2>All games <span data-usual="$7.99">$3.99</span></h2>
+      <p class="launch-note" data-launch>Launch price until 15 November. Usually <s>$7.99</s>.</p>
       <p>Fruit Slicer is free. One purchase opens all the other games, and every new game later. No subscription, no ads, and playing free needs no sign-in.</p>
     </div>
     <div class="places">
-      <a class="place main" href="play/?unlock">Unlock in your browser <span class="go">$7.99 →</span></a>
+      <a class="place main" href="play/?unlock">Unlock in your browser <span class="go" data-usual="$7.99 →">$3.99 →</span></a>
       <div class="place">Mac App Store <span class="soon">Coming soon</span></div>
       <div class="place">App Store for iPad <span class="soon">Coming soon</span></div>
       <div class="place">Steam for Windows <span class="soon">Coming soon</span></div>

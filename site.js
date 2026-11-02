@@ -1,6 +1,13 @@
 // The home page: the top bar, the video window, the label naming the game in the first video, and the game cards that
 // play while you point at them (on a phone, while they are on screen). Nothing moves for people who asked their
 // computer for less motion.
+// The launch price ends by itself at the end of 15 November in California (as the online program's LAUNCH_ENDS):
+// after that the usual price shows again.
+if (Date.now() >= Date.parse('2026-11-16T08:00:00Z')) {
+  document.querySelectorAll('[data-launch]').forEach(e => e.remove());
+  document.querySelectorAll('[data-usual]').forEach(e => { e.textContent = e.dataset.usual; });
+}
+
 const REDUCE = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const HOVER = matchMedia('(hover: hover)').matches;
 

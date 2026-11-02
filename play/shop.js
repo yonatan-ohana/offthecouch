@@ -12,6 +12,7 @@ var OTCShop = (function () {
   // While payments are in practice mode (fake test cards pay), buying is open only on this Mac and the hidden test page.
   var PRACTICE_OK = LOCAL || /\/play-test-/.test(location.pathname);
   var PRICE = "$7.99", CONTACT = "support@cuzgames.com";
+  var WAS = "", ENDS = ""; // during the launch price: the usual price and the day it ends (from the online program)
 
   var answer = 0;          // for the game: 0 while a window is open, then 1 bought, 2 closed, 3 something went wrong
   var settings = null;     // the online program's /api/config: whether buying is open, and the services' public parts
@@ -87,11 +88,23 @@ var OTCShop = (function () {
   }
 
   // The settings, and in real use the services' own scripts: Google's button, the payment window, the robot check.
+  // The settings alone, asked as the page opens so the game and the windows show today's price.
+  var configuring = null;
+  function configure() {
+    if (configuring) return configuring;
+    configuring = call("/api/config").then(function (r) {
+      settings = r;
+      if (r.price && r.price.now) { PRICE = r.price.now; WAS = r.price.was || ""; ENDS = r.price.ends || ""; }
+      return r;
+    });
+    configuring.catch(function () { configuring = null; });
+    return configuring;
+  }
+
   var readying = null;
   function ready() {
     if (readying) return readying;
-    readying = call("/api/config").then(function (r) {
-      settings = r;
+    readying = configure().then(function (r) {
       if (r.paddle && r.paddle.env === "sandbox" && !PRACTICE_OK) r.open = false;
       if (r.pretend || !r.open) return;
       return Promise.all([
@@ -131,6 +144,7 @@ var OTCShop = (function () {
     addEventListener("pagehide", stayed);
     document.addEventListener("visibilitychange", function () { if (document.visibilityState === "hidden") stayed(); });
     watchReader();
+    if (API) configure();
     play = go;
     var asked = /[?&](stopped|playhere)\b/.exec(location.search);
     if (asked) history.replaceState(null, "", location.pathname);
@@ -447,9 +461,9 @@ var OTCShop = (function () {
   // 1 · Unlock: pick how you'll sign in.
   function unlockWindow() {
     return win([
-      kicker("Unlock all games"),
+      kicker(WAS ? "Launch price until " + ENDS : "Unlock all games"),
       title("All games ", PRICE),
-      para("Paid once, with every new game we add."),
+      WAS ? h("p", {}, ["Usually ", h("s", { text: WAS }), ". Paid once, with every new game we add."]) : para("Paid once, with every new game we add."),
       h("hr"),
       para("How will you sign in on your other devices?", "otc-ask"),
       googleButton(function (account) {
@@ -882,5 +896,8 @@ var OTCShop = (function () {
     return /^[1-9]\d{7,14}$/.test(number) ? "+" + number : null;
   }
 
-  return { start: start, buy: buy, account: account, takeAnswer: takeAnswer, step: step, say: say };
+  // The price to show in the game (the launch price while it lasts).
+  function price() { return PRICE; }
+
+  return { start: start, buy: buy, account: account, takeAnswer: takeAnswer, step: step, say: say, price: price };
 })();

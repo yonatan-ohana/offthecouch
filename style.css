@@ -132,6 +132,11 @@ h1, h2, h3 { margin: 0; font-weight: 800; letter-spacing: -0.035em; line-height:
 .price { position: relative; display: grid; grid-template-columns: 1.1fr 1fr; gap: 40px 64px; align-items: center; padding: 56px; border-radius: 32px; background: radial-gradient(120% 140% at 0% 0%, rgba(34, 184, 171, 0.28) 0%, rgba(34, 184, 171, 0) 55%), radial-gradient(90% 120% at 100% 100%, rgba(255, 140, 66, 0.22) 0%, rgba(255, 140, 66, 0) 55%), var(--card); box-shadow: inset 0 0 0 1.5px rgba(255, 255, 255, 0.08); }
 .price h2 { margin-top: 14px; font-size: clamp(44px, 5.4vw, 70px); }
 .price h2 span { display: block; font-size: 1.5em; color: var(--tangerine); }
+.price .say .launch-note { margin-top: 10px; font-weight: 700; color: #FFFFFF; }
+.price .say .launch-note s, .launch s { color: var(--muted); }
+/* The launch price on the first screen (until 15 November; site.js takes it away after). */
+.launch { display: inline-flex; flex-wrap: wrap; gap: 0 6px; margin-bottom: 18px; padding: 9px 16px; border-radius: 999px; background: rgba(255, 140, 66, 0.16); box-shadow: inset 0 0 0 1.5px var(--tangerine); color: #FFFFFF; font-weight: 700; text-decoration: none; }
+.launch b { color: var(--tangerine); }
 .price .say p { margin: 22px 0 0; max-width: 470px; font-size: 18px; color: rgba(255, 255, 255, 0.82); }
 .places { display: grid; gap: 10px; }
 .place { display: flex; align-items: center; gap: 14px; padding: 16px 18px; border-radius: 16px; background: rgba(255, 255, 255, 0.06); font-weight: 700; }
