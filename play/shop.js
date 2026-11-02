@@ -12,6 +12,9 @@ var OTCShop = (function () {
   // While payments are in practice mode (fake test cards pay), buying is open only on this Mac and the hidden test page.
   var PRACTICE_OK = LOCAL || /\/play-test-/.test(location.pathname);
   var PRICE = "$7.99", CONTACT = "support@cuzgames.com";
+  // On itch.io the game runs inside itch's own page, where signing in and paying can't open: buying and signing in
+  // happen on our website, in a new tab, and the games open there.
+  var ON_ITCH = /(^|\.)itch\.(zone|io)$/.test(location.hostname), SITE = "https://offthecouch.cuzgames.com";
   var WAS = "", ENDS = ""; // during the launch price: the usual price and the day it ends (from the online program)
 
   var answer = 0;          // for the game: 0 while a window is open, then 1 bought, 2 closed, 3 something went wrong
@@ -317,6 +320,7 @@ var OTCShop = (function () {
   function buy() {
     step("unlock");
     answer = 0;
+    if (ON_ITCH) return show(websiteWindow(true));
     if (!API) return show(soonWindow());
     show(waitWindow("One moment…"));
     ready().then(function () {
@@ -330,6 +334,7 @@ var OTCShop = (function () {
 
   function account() {
     answer = 0;
+    if (ON_ITCH) return show(websiteWindow(false));
     if (!API) return show(soonWindow());
     show(waitWindow("One moment…"));
     ready().then(function () {
@@ -811,6 +816,22 @@ var OTCShop = (function () {
       button("Try again", "main", function () { waitForCode(phone); }),
       fine("Still nothing? Write to " + CONTACT + ". Your purchase is safe."),
     ], { closable: false });
+  }
+
+  // On itch.io (see ON_ITCH): buying or signing in opens our website in a new tab.
+  function websiteWindow(buying) {
+    var open = function () {
+      window.open(SITE + "/play/?" + (buying ? "unlock" : "signin") + "&from=itch.io", "_blank", "noopener");
+      closed();
+    };
+    return win([
+      kicker(buying ? (WAS ? "Launch price until " + ENDS : "Unlock all games") : "Already bought"),
+      buying ? title("All games ", PRICE) : title("Play on ", "our website"),
+      WAS && buying ? h("p", {}, ["Usually ", h("s", { text: WAS }), ". Paid once, with every new game we add."]) : null,
+      para(buying ? "You unlock on our website, and the games open there, in your browser." : "The games you bought open on our website. Sign in there."),
+      button(buying ? "Unlock on our website" : "Open our website", "main", open),
+      link("Not now", closed),
+    ]);
   }
 
   function soonWindow() {
