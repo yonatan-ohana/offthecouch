@@ -158,6 +158,9 @@ var OTCShop = (function () {
       play(null);
       return ready().then(function () { show(codeWindow({ pending: waiting.pending, typed: waiting.typed })); });
     }
+    var free = /[?&]free\b/.test(location.search); // the giveaway's link (see giveaway)
+    if (free) history.replaceState(null, "", location.pathname);
+    if (API && free && !ON_ITCH) return alone(giveaway);
     var unlock = /[?&]unlock\b/.test(location.search);
     if (unlock) history.replaceState(null, "", location.pathname);
     if (API && !kept("token") && /[?&]signin\b/.test(location.search)) { // "Sign in" on the website
@@ -333,6 +336,57 @@ var OTCShop = (function () {
     }, function (e) {
       show(problemWindow(problem(e)));
     });
+  }
+
+  // The giveaway (owner, 2026-11-02): a limited number of free copies of every game, one per Google account, from one
+  // link shared in posts (play/?free). Signed in and already owning the games: just play.
+  function giveaway() {
+    step("giveaway");
+    answer = 0;
+    show(waitWindow("One moment…"));
+    ready().then(function () {
+      return Promise.all([call("/api/giveaway"), kept("token") ? call("/api/me").catch(function () { kept("token", null); return null; }) : null]);
+    }).then(function (r) {
+      if (r[1]) me = r[1].account;
+      if (me && me.bought) return show(doneWindow(false));
+      show(r[0].left > 0 ? giveawayWindow(r[0]) : giveawayGoneWindow(r[0]));
+    }, function (e) { show(problemWindow(problem(e))); });
+  }
+
+  function giveawayWindow(count) {
+    var take = function () {
+      show(waitWindow("Opening the games…"));
+      call("/api/giveaway", { from: cameFrom() }).then(function (r) {
+        me = r.account;
+        say("took a free copy");
+        show(doneWindow(true));
+      }, function (e) {
+        if (e && e.error === "gone") return show(giveawayGoneWindow({ total: count.total }));
+        show(problemWindow(problem(e)));
+      });
+    };
+    return win([
+      kicker("Giveaway · " + count.left + " of " + count.total + " left"),
+      title("All games, ", "free"),
+      para("We're giving away " + count.total + " free copies of every game. Sign in to take yours."),
+      h("hr"),
+      me && kept("token") ? button("Take my free copy", "main", take) : googleButton(function (account) {
+        if (account.bought) return show(doneWindow(false));
+        take();
+      }),
+      fine("One per person. Nothing to pay, no card."),
+      link("Just play Fruit Slicer", closed),
+    ]);
+  }
+
+  function giveawayGoneWindow(count) {
+    return win([
+      kicker("Giveaway"),
+      title("All ", "taken"),
+      para("All " + count.total + " free copies are gone. You can still unlock every game for " + PRICE + (WAS ? ", usually " + WAS : "") + "."),
+      button("Unlock all games · " + PRICE, "main", function () { show(unlockWindow()); }),
+      link("Just play Fruit Slicer", closed),
+    ]);
   }
 
   function account() {
