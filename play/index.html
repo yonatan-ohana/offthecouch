@@ -59,6 +59,41 @@
       #full { display: none; position: fixed; right: calc(27% + 12px); top: 12px; z-index: 10; width: 44px; height: 44px; padding: 0;
         border: 0; border-radius: 50%; background: #FFC93C; box-shadow: 0 4px 0 rgba(0, 0, 0, .35); align-items: center; justify-content: center; }
       body.phone.can-fill #full { display: flex; }
+      /* A first visit (owner's pick 2026-11-02, "the game is already playing"): instead of the card, the paper orchard
+         with fruit flying and being sliced from the first second, then one gold button. See "first visit" below. */
+      #orchard { display: none; position: fixed; inset: 0; z-index: 5; overflow: hidden; background: #A9C8D6 url(orchard/orchard.webp) center / cover;
+        font: 600 17px/1.4 -apple-system, "Segoe UI", system-ui, sans-serif; transition: opacity .5s; }
+      body.first #orchard { display: block; }
+      body.first #loading { display: none; }
+      body.first.failed #loading { display: block; z-index: 6; }
+      #orchard.lifting { opacity: 0; pointer-events: none; }
+      #orchard h1 { position: absolute; left: 0; right: 0; top: 7vh; margin: 0; text-align: center; color: #FFFFFF;
+        font: 400 clamp(54px, 10vw, 120px)/1 "Caveat Brush", -apple-system, system-ui, sans-serif;
+        -webkit-text-stroke: 4px #2B1D4A; paint-order: stroke fill; text-shadow: 0 6px 0 rgba(43, 29, 74, .35); }
+      #orchard .fruit { position: absolute; left: 0; top: 0; height: clamp(90px, 15vh, 160px); pointer-events: none;
+        filter: drop-shadow(0 6px 4px rgba(43, 29, 74, .3)); will-change: transform; }
+      #orchard .splat { position: absolute; width: 150px; height: 150px; margin: -75px 0 0 -75px; border-radius: 50%; pointer-events: none;
+        animation: splat .7s ease-out forwards; }
+      @keyframes splat { from { transform: scale(.2); opacity: .95; } to { transform: scale(1.4); opacity: 0; } }
+      #orchard svg.slash { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; overflow: visible; }
+      #orchard svg.slash path { fill: none; stroke: #FFF6C8; stroke-width: 12; stroke-linecap: round; filter: drop-shadow(0 0 8px #FFE27A); }
+      #orchard .middle { position: absolute; left: 50%; top: 56%; transform: translate(-50%, -50%); display: flex; flex-direction: column;
+        align-items: center; gap: 16px; width: calc(100vw - 32px); opacity: 0; transition: opacity .5s; }
+      #orchard.ready .middle { opacity: 1; }
+      #play { display: inline-flex; align-items: center; gap: 14px; font: 800 clamp(24px, 3.2vw, 38px)/1.1 -apple-system, "Segoe UI", system-ui, sans-serif;
+        color: #2B1D4A; background: #FFC93C; border: 0; border-radius: 999px; padding: 22px 46px; cursor: pointer;
+        box-shadow: 0 8px 0 #C9921A, 0 14px 30px rgba(43, 29, 74, .35); animation: breathe 2.2s ease-in-out infinite; }
+      #play:active { transform: translateY(4px); box-shadow: 0 4px 0 #C9921A, 0 8px 20px rgba(43, 29, 74, .35); }
+      #play[disabled] { animation: none; cursor: default; }
+      #play svg { width: 1.1em; height: 1.1em; flex: none; }
+      @keyframes breathe { 50% { transform: scale(1.04); } }
+      #orchard .line { display: inline-flex; align-items: center; gap: 10px; max-width: 640px; padding: 10px 20px; border-radius: 999px;
+        background: rgba(43, 29, 74, .82); color: #FFFFFF; text-align: center; }
+      #orchard .line svg { width: 18px; height: 18px; flex: none; }
+      #orchard .line.problem { border-radius: 22px; background: #2B1D4A; }
+      #growing { position: absolute; left: 50%; bottom: 7vh; width: min(360px, 60vw); height: 12px; transform: translateX(-50%);
+        border-radius: 6px; background: rgba(43, 29, 74, .55); overflow: hidden; }
+      #growing div { height: 100%; width: 0; background: #FFC93C; border-radius: 6px; transition: width .2s; }
     </style>
   </head>
   <body>
@@ -73,6 +108,14 @@
         <button id="copy">Copy the link</button>
         <a id="get" href="https://www.google.com/chrome/" target="_blank" rel="noopener">Get Chrome</a>
       </div>
+    </div>
+    <div id="orchard">
+      <h1>Fruit Slicer</h1>
+      <div class="middle">
+        <button id="play"><svg viewBox="0 0 24 24" fill="none" stroke="#2B1D4A" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.6"/></svg><span>Play with your camera</span></button>
+        <div class="line" id="promise"><svg viewBox="0 0 24 24" fill="#FFC93C" aria-hidden="true"><path d="M7 10V7a5 5 0 0 1 10 0v3h1.5v11h-13V10zm2.4 0h5.2V7a2.6 2.6 0 0 0-5.2 0z"/></svg><span>Your picture stays on your device. Nothing is recorded.</span></div>
+      </div>
+      <div id="growing"><div></div></div>
     </div>
     <div id="turn" role="img" aria-label="Turn your device sideways to play">
       <svg viewBox="0 0 180 180" aria-hidden="true">
@@ -89,9 +132,9 @@
       var bar = document.querySelector("#bar div");
       var config = {
         arguments: [],
-        dataUrl: "Build/d1f2b108bff44bc5ba443ec8b34b4894.data.unityweb",
-        frameworkUrl: "Build/85d630e45c9c09e9e37f2291895e9c9f.framework.js.unityweb",
-        codeUrl: "Build/69cc60c7df47326c5f5806a2c8071db8.wasm.unityweb",
+        dataUrl: "Build/f7c78684dbe62c04cf59303e37219aa9.data.unityweb",
+        frameworkUrl: "Build/180fc485551c28e21bef7d2f98194ae4.framework.js.unityweb",
+        codeUrl: "Build/c26e164122ed805bdeae5549b96bb516.wasm.unityweb",
         streamingAssetsUrl: "StreamingAssets",
         companyName: "Yonatan Ohana",
         productName: "Off the Couch",
@@ -290,7 +333,132 @@
             document.querySelector("#loading p").textContent = "Open this address in Google Chrome on a computer: " + link;
           });
         };
-      } else OTCShop.start(play);
+      } else {
+        firstVisit();
+        OTCShop.start(play);
+      }
+
+      // A first visit (nothing marked on this device yet, or ?first to try it): the paper orchard over the game while
+      // it downloads, fruit flying and being sliced from the first moment, then one button, "Play with your camera",
+      // that asks for the camera right away (people say yes far more often to a question that follows their own tap).
+      // The game meanwhile goes straight into Fruit Slicer (see Boot and WebPage in the game) and says when it can be
+      // played; then the orchard lifts and they are in it. Everyone after that gets the card above.
+      function firstVisit() {
+        var forced = new URLSearchParams(location.search).has("first"), seen = false;
+        try { seen = localStorage.getItem("otcPlayed") === "1"; } catch (e) {}
+        if (seen && !forced) return;
+        document.body.classList.add("first");
+        var page = document.getElementById("orchard"), button = document.getElementById("play"), label = button.querySelector("span");
+        var promise = document.getElementById("promise"), tapped = false, allowed = false, ready = false;
+        var tell = function (words) { if (window.OTCShop && OTCShop.say) OTCShop.say("page: " + words); };
+        window.OTCPage = {
+          firstVisit: true,
+          gameReady: function () { ready = true; lift(); }
+        };
+        setTimeout(function () { page.classList.add("ready"); }, 900);
+        flying(page);
+
+        button.onclick = function () {
+          if (tapped) return;
+          tapped = true;
+          button.disabled = true;
+          label.textContent = "Starting the camera...";
+          tell("tapped Play with your camera");
+          var media = navigator.mediaDevices;
+          if (!media || !media.getUserMedia) return refused("This browser has no camera to give. Try Chrome.");
+          media.getUserMedia({ audio: false, video: { width: { ideal: 1280 }, height: { ideal: 720 }, frameRate: { ideal: 30 } } })
+            .then(function (stream) {
+              allowed = true;
+              window.OTCEarlyCamera = stream; // the game's camera takes this one (see BrowserReader.jspre)
+              var reader = window.OTCReader;
+              if (reader && reader.state !== 0 && reader.camera === 0) reader.ask(); // the game was here first
+              tell("camera allowed");
+              label.textContent = "Getting the fruit ready...";
+              lift();
+            }, function (error) {
+              refused(error && error.name === "NotAllowedError"
+                ? "The camera is blocked. Click the camera sign in the address bar, choose Allow, then tap the button again."
+                : "No camera was found, or another app is using it. Close that app, then tap the button again.");
+            });
+        };
+
+        function refused(words) {
+          tapped = false;
+          button.disabled = false;
+          label.textContent = "Try again";
+          promise.classList.add("problem");
+          promise.querySelector("span").textContent = words;
+          tell("camera: " + words.split(".")[0].toLowerCase());
+        }
+
+        // Into the game once both are true: the camera is allowed and the game can be played.
+        function lift() {
+          if (!allowed || !ready || page.classList.contains("lifting")) return;
+          page.classList.add("lifting");
+          try { localStorage.setItem("otcPlayed", "1"); } catch (e) {}
+          setTimeout(function () { page.remove(); }, 600);
+          document.querySelector("#unity-canvas").focus();
+        }
+      }
+
+      // The orchard's fruit: thrown up from below every moment, turning as they fly; now and then a gold slash cuts
+      // one, which bursts into juice.
+      function flying(page) {
+        var kinds = { apple: "#E2553F", orange: "#F0AA5A", plum: "#8E6CC0", lemon: "#F2D35B", lime: "#8DBF5A", watermelon: "#F07A6A" };
+        var names = Object.keys(kinds), count = 0;
+        var throwOne = function () {
+          if (!page.isConnected || page.classList.contains("lifting")) return;
+          var name = names[Math.floor(Math.random() * names.length)];
+          var fruit = document.createElement("img");
+          fruit.className = "fruit";
+          fruit.alt = "";
+          fruit.src = "orchard/" + name + ".webp";
+          page.insertBefore(fruit, page.querySelector(".middle"));
+          var w = innerWidth, h = innerHeight, from = w * (0.15 + 0.7 * Math.random()), to = from + w * (Math.random() - 0.5) * 0.35;
+          var peak = h * (0.2 + 0.25 * Math.random()), turn = (Math.random() < 0.5 ? -1 : 1) * (120 + 200 * Math.random());
+          var seconds = 2.6 + Math.random() * 0.8, cut = ++count % 3 === 0;
+          var frames = [], steps = 24;
+          for (var i = 0; i <= steps; i++) {
+            var t = i / steps, x = from + (to - from) * t, y = h + 40 - (h + 40 - peak) * (1 - Math.pow(2 * t - 1, 2));
+            frames.push({ transform: "translate(" + x + "px," + y + "px) translate(-50%,-50%) rotate(" + turn * t + "deg)" });
+          }
+          var flight = fruit.animate(frames, { duration: seconds * 1000, easing: "linear" });
+          flight.onfinish = function () { fruit.remove(); };
+          if (!cut) return;
+          // Cut near the top of its flight, by a slash across it.
+          setTimeout(function () {
+            if (!fruit.isConnected) return;
+            var box = fruit.getBoundingClientRect(), x = box.left + box.width / 2, y = box.top + box.height / 2, side = Math.random() < 0.5 ? -1 : 1;
+            var slash = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+            slash.setAttribute("class", "slash");
+            var path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+            path.setAttribute("d", "M" + (x - side * 220) + " " + (y + 120) + " Q " + x + " " + (y - 30) + " " + (x + side * 220) + " " + (y - 110));
+            slash.appendChild(path);
+            page.insertBefore(slash, page.querySelector(".middle"));
+            var length = path.getTotalLength();
+            path.style.strokeDasharray = length;
+            path.animate([{ strokeDashoffset: length, opacity: 1 }, { strokeDashoffset: 0, opacity: 1, offset: 0.45 }, { strokeDashoffset: -length, opacity: 0 }],
+              { duration: 450, easing: "ease-out" }).onfinish = function () { slash.remove(); };
+            setTimeout(function () {
+              var splat = document.createElement("div");
+              splat.className = "splat";
+              splat.style.left = x + "px";
+              splat.style.top = y + "px";
+              splat.style.background = "radial-gradient(circle, " + kinds[name] + " 0 38%, transparent 40%)";
+              page.insertBefore(splat, page.querySelector(".middle"));
+              setTimeout(function () { splat.remove(); }, 750);
+              fruit.remove();
+            }, 140);
+          }, seconds * 1000 * (0.4 + 0.15 * Math.random()));
+        };
+        throwOne();
+        setTimeout(throwOne, 200);
+        setTimeout(throwOne, 450);
+        var timer = setInterval(function () {
+          if (!page.isConnected) return clearInterval(timer);
+          throwOne();
+        }, 480);
+      }
 
       // Loads and starts the game: the free download, or the full one (full: where its four files are).
       function play(full) {
@@ -300,19 +468,22 @@
           config.codeUrl = full.code;
         }
         var loader = document.createElement("script");
-        loader.src = full ? full.loader : "Build/6058aa9b85b3f2422ff1d410b38fd18b.loader.js";
+        loader.src = full ? full.loader : "Build/68d603b5b0eb6956ad448fdf8e2b7f38.loader.js";
         loader.onerror = function () {
           document.querySelector("#loading p").textContent = "The games did not download. Check the internet and reload the page.";
+          document.body.classList.add("failed");
         };
         loader.onload = function () {
           createUnityInstance(document.querySelector("#unity-canvas"), config, function (progress) {
             bar.style.width = Math.round(100 * progress) + "%";
+            document.querySelector("#growing div").style.width = Math.round(100 * progress) + "%";
           }).then(function (game) {
             window.OTCGame = game; // for looking at it from the browser's console (and the phone test's numbers)
             document.getElementById("loading").remove();
             document.querySelector("#unity-canvas").focus(); // keys reach the game without a click first
           }).catch(function (message) {
             document.querySelector("#loading p").textContent = message;
+            document.body.classList.add("failed");
           });
         };
         document.body.appendChild(loader);
