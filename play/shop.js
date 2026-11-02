@@ -87,6 +87,7 @@ var OTCShop = (function () {
     if (error === "expired") return "That code has run out. Send a new one.";
     if (error === "limit") return "Too many tries for now. Try again tomorrow.";
     if (error === "robot") return "The check that you're a person didn't work. Try again.";
+    if (error === "gift") return "That code doesn't work. Check it, or write to " + CONTACT + ".";
     return "Something went wrong. Try again, or write to " + CONTACT + ".";
   }
 
@@ -234,7 +235,7 @@ var OTCShop = (function () {
     try {
       fetch(API + "/api/step", { method: "POST", keepalive: true, headers: { "Content-Type": "text/plain" },
         body: JSON.stringify({ step: name, game: game || "", detail: detail || "", count: first && name !== "say", from: cameFrom(),
-          visit: visit(), at: Date.now() - visitStart(), device: device() }) }).catch(function () {});
+          visit: visit(), at: Date.now() - visitStart(), device: deviceKind() }) }).catch(function () {});
     } catch (e) {}
   }
   function say(words) { step("say", "", words); }
@@ -269,7 +270,9 @@ var OTCShop = (function () {
   function visitStart() {
     try { return +sessionStorage.getItem("otcStart") || openedAt; } catch (e) { return openedAt; }
   }
-  function device() {
+  // Which kind of device this is, for the visit's story. (Not named device: that is this computer's own number above,
+  // which signing in sends; the same name here broke signing in from 31 October to 2 November 2026.)
+  function deviceKind() {
     return /iPhone|iPad|Android|Mobi/.test(navigator.userAgent) || (/Macintosh/.test(navigator.userAgent) && navigator.maxTouchPoints > 1) ? "phone" : "computer";
   }
 
@@ -478,7 +481,56 @@ var OTCShop = (function () {
       button("Use my phone number", "glass", function () { show(phoneWindow("buy")); }, PHONE),
       fine("Next, you pay in the payment company's window."),
       link("Already bought? Sign in", function () { show(welcomeWindow()); }),
+      link("Got a free code?", function () { show(giftWindow()); }),
     ]);
+  }
+
+  // A free code (given to people who film themselves playing): typed, checked, then signing in with Google keeps the
+  // games on every device. Someone already signed in uses it straight away.
+  function giftWindow() {
+    var code = h("input", { type: "text", autocomplete: "off", autocapitalize: "characters", spellcheck: "false", placeholder: "OTC-XXXX-XXXX", "aria-label": "Your code" });
+    var error = h("p", { class: "otc-error", role: "alert" });
+    var go = function () {
+      error.textContent = "";
+      call("/api/gift/check", { code: code.value }).then(function (r) {
+        if (!r.ok) return (error.textContent = problem({ error: "gift" }));
+        if (me && kept("token")) return useGift(code.value);
+        show(giftSignInWindow(code.value));
+      }, function (e) { error.textContent = problem(e); });
+    };
+    var box = win([
+      kicker("Free code"),
+      title("Got a ", "code?"),
+      para("Type the code you were given. It opens every game."),
+      h("div", { class: "otc-field" }, [code]),
+      error,
+      button("Use my code", "main", go),
+      link("Back", function () { show(unlockWindow()); }),
+    ]);
+    code.addEventListener("keydown", function (e) { if (e.key === "Enter") go(); });
+    setTimeout(function () { code.focus(); }, 50);
+    return box;
+  }
+
+  function giftSignInWindow(code) {
+    return win([
+      kicker("Free code"),
+      title("The code ", "works!"),
+      para("Sign in to keep the games on all your devices."),
+      googleButton(function (account) {
+        if (account.bought) return show(doneWindow(false));
+        useGift(code);
+      }),
+      link("Back", function () { show(giftWindow()); }),
+    ]);
+  }
+
+  function useGift(code) {
+    show(waitWindow("Opening the games…"));
+    call("/api/gift", { code: code }).then(function (r) {
+      me = r.account;
+      show(doneWindow(true));
+    }, function (e) { show(problemWindow(problem(e))); });
   }
 
   // Another computer: sign in once, then it stays signed in.
