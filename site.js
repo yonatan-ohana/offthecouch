@@ -95,7 +95,7 @@ function isTest() {
     const all = (location.search + ' ' + ref + ' ' + navigator.userAgent).toLowerCase();
     const from = test ? 'test' : /tiktok|musical_ly|bytedance|ttclid/.test(all) ? 'tiktok' : /instagram/.test(all) ? 'instagram' :
       /facebook|fban|fbav|fbclid/.test(all) ? 'facebook' : /youtube/.test(all) ? 'youtube' : /google|gclid/.test(all) ? 'google' :
-      /itch\.io/.test(all) ? 'itch' : /bing|duckduckgo|yahoo|ecosia/.test(all) ? 'search' : ref ? 'site' : 'direct';
+      /itch\.io/.test(all) ? 'itch' : /discord/.test(all) ? 'discord' : /bing|duckduckgo|yahoo|ecosia/.test(all) ? 'search' : ref ? 'site' : 'direct';
     const visit = Math.random().toString(36).slice(2, 12);
     const device = /iPhone|iPad|Android|Mobi/.test(navigator.userAgent) || (/Macintosh/.test(navigator.userAgent) && navigator.maxTouchPoints > 1) ? 'phone' : 'computer';
     let start = Date.now();

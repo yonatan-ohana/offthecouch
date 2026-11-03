@@ -161,6 +161,9 @@ var OTCShop = (function () {
     var free = /[?&]free\b/.test(location.search); // the giveaway's link (see giveaway)
     if (free) history.replaceState(null, "", location.pathname);
     if (API && free && !ON_ITCH) return alone(giveaway);
+    var gift = /[?&]code=([A-Za-z0-9-]{8,20})/.exec(location.search); // a free code's link (Discord's button, see /api/discord)
+    if (gift) history.replaceState(null, "", location.pathname);
+    if (API && gift && !ON_ITCH) return alone(function () { show(giftWindow(gift[1])); });
     var unlock = /[?&]unlock\b/.test(location.search);
     if (unlock) history.replaceState(null, "", location.pathname);
     if (API && !kept("token") && /[?&]signin\b/.test(location.search)) { // "Sign in" on the website
@@ -291,7 +294,7 @@ var OTCShop = (function () {
     var all = (location.search + " " + ref + " " + navigator.userAgent).toLowerCase(), from =
       /tiktok|musical_ly|bytedance|ttclid/.test(all) ? "tiktok" : /instagram/.test(all) ? "instagram" :
       /facebook|fban|fbav|fbclid/.test(all) ? "facebook" : /youtube/.test(all) ? "youtube" : /google|gclid/.test(all) ? "google" :
-      /itch\.io/.test(all) ? "itch" : /bing|duckduckgo|yahoo|ecosia/.test(all) ? "search" : ref ? "site" : "direct";
+      /itch\.io/.test(all) ? "itch" : /discord/.test(all) ? "discord" : /bing|duckduckgo|yahoo|ecosia/.test(all) ? "search" : ref ? "site" : "direct";
     try { sessionStorage.setItem("otcFrom", from); } catch (e) {}
     return from;
   }
@@ -539,9 +542,10 @@ var OTCShop = (function () {
     ]);
   }
 
-  // A free code (given to people who film themselves playing): typed, checked, then signing in with Google keeps the
-  // games on every device. Someone already signed in uses it straight away.
-  function giftWindow() {
+  // A free code (given to people who film themselves playing, or from the Discord button): typed, checked, then signing
+  // in with Google keeps the games on every device. Someone already signed in uses it straight away. given: a code
+  // that came in the link, filled in and checked at once.
+  function giftWindow(given) {
     var code = h("input", { type: "text", autocomplete: "off", autocapitalize: "characters", spellcheck: "false", placeholder: "OTC-XXXX-XXXX", "aria-label": "Your code" });
     var error = h("p", { class: "otc-error", role: "alert" });
     var go = function () {
@@ -562,7 +566,10 @@ var OTCShop = (function () {
       link("Back", function () { show(unlockWindow()); }),
     ]);
     code.addEventListener("keydown", function (e) { if (e.key === "Enter") go(); });
-    setTimeout(function () { code.focus(); }, 50);
+    if (given) {
+      code.value = given;
+      setTimeout(go, 0);
+    } else setTimeout(function () { code.focus(); }, 50);
     return box;
   }
 
