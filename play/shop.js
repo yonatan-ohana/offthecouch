@@ -235,6 +235,7 @@ var OTCShop = (function () {
   var counted = {}, openedAt = Date.now(), told = 0, tester = isTest();
   var ONCE = ["site", "page", "phone", "camera_on", "camera_refused", "camera_none", "person", "left"];
   function step(name, game, detail) {
+    afterRound(name, detail);
     var key = name + "|" + (game || ""), first = !counted[key];
     if (!API || (!first && ONCE.indexOf(name) >= 0) || ++told > 150) return;
     counted[key] = true;
@@ -352,15 +353,101 @@ var OTCShop = (function () {
     }).then(function (r) {
       if (r[1]) me = r[1].account;
       if (me && me.bought) return show(doneWindow(false));
+      if (r[0].left > 0 && deviceKind() === "phone") {
+        giftCount = r[0];
+        close();
+        return phoneWelcome();
+      }
       show(r[0].left > 0 ? giveawayWindow(r[0]) : giveawayGoneWindow(r[0]));
     }, function (e) { show(problemWindow(problem(e))); });
   }
+
+  // The giveaway on phones (owner, 2026-11-03, after nearly everyone tapping the TikTok ad left within 2 seconds of a
+  // plain offer: "make the play more appealing and do the code to the side"): a page in the game's paper look whose
+  // one big button starts Fruit Slicer, with the free code as a small gift tag in the corner; the code is offered again
+  // once the first round is over, and the tag comes back between rounds (never during one).
+  var giftCount = null, giftTaken = false, offered = false, tag = null;
+  function phoneWelcome() {
+    say("saw the phone giveaway page");
+    var video = h("video", { src: "../video/play/fruit-slicer.mp4", poster: "../video/play/fruit-slicer.jpg", autoplay: "", loop: "", playsinline: "" });
+    video.muted = true;
+    var page = h("div", { class: "otc-phone" }, [
+      giftTag(),
+      h("div", { class: "otc-frame" }, [video, h("span", { text: "Fruit Slicer · you slice with your hands" })]),
+      h("p", { class: "otc-hello" }, ["Your body is", h("span", { text: "the controller" })]),
+      h("button", { class: "otc-go", type: "button", onclick: function () {
+        say("pressed Play Fruit Slicer now");
+        page.remove();
+        closed();
+      } }, ["Play Fruit Slicer now ▶", h("small", { text: "Stand the phone up, step back" })]),
+    ]);
+    document.body.appendChild(page);
+    if (video.play) video.play().catch(function () {});
+  }
+
+  function giftTag() {
+    return h("button", { class: "otc-gift", type: "button", onclick: grabCode },
+      [h("i", { text: "🎁" }), h("span", {}, ["Free code", h("em", { text: "all 8 games · " + giftCount.left + " left" })])]);
+  }
+
+  // The gift tag or "Grab my free code": the giveaway's own window (a code inside TikTok and the like, else Google).
+  function grabCode() {
+    say("opened the free code offer");
+    var page = document.querySelector(".otc-phone");
+    if (page) page.remove();
+    hideTag();
+    show(waitWindow("One moment…"));
+    giveawayLeftThen(function (count) {
+      giftCount = count;
+      show(count.left > 0 ? giveawayWindow(count) : giveawayGoneWindow(count));
+    });
+  }
+
+  // What the game says (see step): a round over → the offer the first time, the gift tag after that; a round
+  // starting → the tag goes.
+  function afterRound(name, detail) {
+    if (!giftCount || giftTaken) return;
+    if (name === "start") return hideTag();
+    if (name !== "round") return;
+    if (offered) return showTag();
+    offered = true;
+    var score = /score (\d+)/.exec(detail || "");
+    setTimeout(function () { show(roundOffer(score ? score[1] : "")); }, 1800);
+  }
+
+  function roundOffer(score) {
+    return h("div", { class: "otc-win otc-paper", role: "dialog", "aria-modal": "true" }, [
+      score ? h("p", { class: "otc-k", text: "Your score" }) : null,
+      score ? h("p", { class: "otc-score", text: score }) : null,
+      h("p", { class: "otc-more" }, ["Liked it? 7 more games,", h("span", { text: "free for you" })]),
+      h("button", { class: "otc-grab", type: "button", onclick: grabCode },
+        ["Grab my free code", h("small", { text: giftCount.left + " of " + giftCount.total + " left · keep it for later" })]),
+      h("button", { class: "otc-again", type: "button", text: "Play again ▶", onclick: function () {
+        say("closed the free code offer");
+        close();
+        showTag();
+      } }),
+    ]);
+  }
+
+  function showTag() {
+    if (!giftCount || giftTaken) return;
+    if (!tag) {
+      tag = giftTag();
+      tag.classList.add("otc-gift-float");
+      document.body.appendChild(tag);
+    }
+    tag.hidden = false;
+  }
+  function hideTag() { if (tag) tag.hidden = true; }
 
   function giveawayWindow(count) {
     var take = function () {
       show(waitWindow("Opening the games…"));
       call("/api/giveaway", { from: cameFrom(), visit: visit() }).then(function (r) {
         me = r.account;
+        giftTaken = true;
+        hideTag();
         say("took a free copy");
         show(doneWindow(true));
       }, function (e) {
@@ -402,6 +489,8 @@ var OTCShop = (function () {
   function phoneCode() {
     show(waitWindow("Getting your code…"));
     call("/api/giveaway/code", { device: device(), from: cameFrom(), visit: visit() }).then(function (r) {
+      giftTaken = true;
+      hideTag();
       say("took a free code on the phone");
       show(phoneCodeWindow(r.code));
     }, function (e) {
