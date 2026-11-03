@@ -11,7 +11,7 @@ var OTCShop = (function () {
   var API = LOCAL ? "http://localhost:8821" : "https://api.cuzgames.com";
   // While payments are in practice mode (fake test cards pay), buying is open only on this Mac and the hidden test page.
   var PRACTICE_OK = LOCAL || /\/play-test-/.test(location.pathname);
-  var PRICE = "$7.99", CONTACT = "support@cuzgames.com";
+  var PRICE = "$7.99", CONTACT = "support@cuzgames.com", DISCORD = "https://discord.gg/fHxH9XVwNA"; // our Discord server (invite never expires)
   // On itch.io the game runs inside itch's own page, where signing in and paying can't open: buying and signing in
   // happen on our website, in a new tab, and the games open there.
   var ON_ITCH = /(^|\.)itch\.(zone|io)$/.test(location.hostname), SITE = "https://offthecouch.cuzgames.com";
@@ -378,6 +378,7 @@ var OTCShop = (function () {
         take();
       }),
       fine("One per person. Nothing to pay, no card."),
+      link("Join us on Discord", discord),
       link("Just play Fruit Slicer", closed),
     ]);
   }
@@ -388,8 +389,15 @@ var OTCShop = (function () {
       title("All ", "taken"),
       para("All " + count.total + " free copies are gone. You can still unlock every game for " + PRICE + (WAS ? ", usually " + WAS : "") + "."),
       button("Unlock all games · " + PRICE, "main", function () { show(unlockWindow()); }),
+      link("Join us on Discord", discord),
       link("Just play Fruit Slicer", closed),
     ]);
+  }
+
+  // Our Discord server, in a new tab (counted as a step of the visit).
+  function discord() {
+    say("opened our Discord");
+    window.open(DISCORD, "_blank", "noopener");
   }
 
   function account() {
