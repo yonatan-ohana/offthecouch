@@ -163,7 +163,7 @@ var OTCShop = (function () {
     if (API && free && !ON_ITCH) return alone(giveaway);
     var gift = /[?&]code=([A-Za-z0-9-]{8,20})/.exec(location.search); // a free code's link (Discord's button, see /api/discord)
     if (gift) history.replaceState(null, "", location.pathname);
-    if (API && gift && !ON_ITCH) return alone(function () { show(giftWindow(gift[1])); });
+    if (API && gift && !ON_ITCH) return alone(function () { freeCode(gift[1]); });
     var unlock = /[?&]unlock\b/.test(location.search);
     if (unlock) history.replaceState(null, "", location.pathname);
     if (API && !kept("token") && /[?&]signin\b/.test(location.search)) { // "Sign in" on the website
@@ -553,7 +553,7 @@ var OTCShop = (function () {
       call("/api/gift/check", { code: code.value }).then(function (r) {
         if (!r.ok) return (error.textContent = problem({ error: "gift" }));
         if (me && kept("token")) return useGift(code.value);
-        show(giftSignInWindow(code.value));
+        return ready().then(function () { show(giftSignInWindow(code.value)); });
       }, function (e) { error.textContent = problem(e); });
     };
     var box = win([
@@ -571,6 +571,18 @@ var OTCShop = (function () {
       setTimeout(go, 0);
     } else setTimeout(function () { code.focus(); }, 50);
     return box;
+  }
+
+  // A free code's link: the sign-in parts load first (Google's button needs them), then the code is checked.
+  function freeCode(given) {
+    show(waitWindow("One moment…"));
+    ready().then(function () {
+      return kept("token") ? call("/api/me").catch(function () { kept("token", null); return null; }) : null;
+    }).then(function (r) {
+      if (r) me = r.account;
+      if (me && me.bought) return show(doneWindow(false));
+      show(giftWindow(given));
+    }, function (e) { show(problemWindow(problem(e))); });
   }
 
   function giftSignInWindow(code) {
