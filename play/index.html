@@ -136,9 +136,9 @@
       var Files = "https://api.cuzgames.com/api/free/build/";
       var config = {
         arguments: [],
-        dataUrl: Files + "8667fd51e80a92f1bd0f50676cf124c3.data.unityweb",
-        frameworkUrl: Files + "88535c4844bb77b0067ef335b9d5ad8f.framework.js.unityweb",
-        codeUrl: Files + "ed3494e6760285f9dbd719f2d5af8995.wasm.unityweb",
+        dataUrl: Files + "d813c73d4902ca2c0cf464aee55aaa3a.data.unityweb",
+        frameworkUrl: Files + "92217fa2eb75fd9bc8b7bdc5c3a845a6.framework.js.unityweb",
+        codeUrl: Files + "85253e5dc5a8e03b492c2668266962e6.wasm.unityweb",
         streamingAssetsUrl: "StreamingAssets",
         companyName: "Yonatan Ohana",
         productName: "Off the Couch",
@@ -338,25 +338,26 @@
           });
         };
       } else {
-        firstVisit();
+        orchardStart();
         OTCShop.start(play);
       }
 
-      // A first visit (nothing marked on this device yet, or ?first to try it): the paper orchard over the game while
-      // it downloads, fruit flying and being sliced from the first moment, then one button, "Play with your camera",
-      // that asks for the camera right away (people say yes far more often to a question that follows their own tap).
-      // The game meanwhile goes straight into Fruit Slicer (see Boot and WebPage in the game) and says when it can be
-      // played; then the orchard lifts and they are in it. Everyone after that gets the card above.
-      function firstVisit() {
+      // Every visit (owner 2026-11-03: the old card with the drawn computer and "Turn on" must never show): the paper
+      // orchard over the game while it downloads, fruit flying and being sliced from the first moment, then one button,
+      // "Play with your camera", that asks for the camera right away (people say yes far more often to a question that
+      // follows their own tap). On a first visit (nothing marked on this device yet, or ?first to try it) the game
+      // meanwhile goes straight into Fruit Slicer; after that, to the menu (see Boot and WebPage in the game). The game
+      // says when it can be played; then the orchard lifts and they are in it.
+      function orchardStart() {
         var forced = new URLSearchParams(location.search).has("first"), seen = false;
         try { seen = localStorage.getItem("otcPlayed") === "1"; } catch (e) {}
-        if (seen && !forced) return;
         document.body.classList.add("first");
         var page = document.getElementById("orchard"), button = document.getElementById("play"), label = button.querySelector("span");
         var promise = document.getElementById("promise"), tapped = false, allowed = false, ready = false;
         var tell = function (words) { if (window.OTCShop && OTCShop.say) OTCShop.say("page: " + words); };
         window.OTCPage = {
-          firstVisit: true,
+          firstVisit: !seen || forced,
+          orchard: true,
           gameReady: function () { ready = true; lift(); }
         };
         setTimeout(function () { page.classList.add("ready"); }, 900);
@@ -367,7 +368,7 @@
           tapped = true;
           button.disabled = true;
           label.textContent = "Starting the camera...";
-          tell("tapped Play with your camera");
+          tell("tapped Play with your camera" + (seen && !forced ? " (back again)" : ""));
           var media = navigator.mediaDevices;
           if (!media || !media.getUserMedia) return refused("This browser has no camera to give. Try Chrome.");
           media.getUserMedia({ audio: false, video: { width: { ideal: 1280 }, height: { ideal: 720 }, frameRate: { ideal: 30 } } })
@@ -472,7 +473,7 @@
           config.codeUrl = full.code;
         }
         var loader = document.createElement("script");
-        loader.src = full ? full.loader : Files + "af56fd9997a69b32fc5dab4472d87c7f.loader.js";
+        loader.src = full ? full.loader : Files + "327f526aba359949c3ff5273927fa7a2.loader.js";
         loader.onerror = function () {
           if (!full && Files !== "Build/") { // the website's own copy instead
             ["dataUrl", "frameworkUrl", "workerUrl", "codeUrl", "symbolsUrl"].forEach(function (part) {

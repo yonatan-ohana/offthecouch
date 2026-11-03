@@ -1025,6 +1025,8 @@ var OTCShop = (function () {
 
   // The price to show in the game (the launch price while it lasts).
   function price() { return PRICE; }
+  // During the launch price: the usual price and the day it ends, as "$7.99|15 November" (empty otherwise).
+  function sale() { return WAS ? WAS + "|" + ENDS : ""; }
 
-  return { start: start, buy: buy, account: account, takeAnswer: takeAnswer, step: step, say: say, price: price };
+  return { start: start, buy: buy, account: account, takeAnswer: takeAnswer, step: step, say: say, price: price, sale: sale };
 })();
