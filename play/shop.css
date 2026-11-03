@@ -44,6 +44,8 @@
 .otc-link:hover { text-decoration: underline; }
 .otc-link:disabled { color: var(--muted); text-decoration: none; cursor: default; }
 .otc-gsi { display: flex; justify-content: center; min-height: 44px; }
+.otc-win .otc-code { padding: 14px 18px; border: 1.5px dashed rgba(255, 255, 255, 0.3); border-radius: 16px; font: 800 30px/1.1 ui-monospace, "SF Mono", Menlo, monospace;
+  letter-spacing: 0.06em; color: #FFFFFF; user-select: all; -webkit-user-select: all; }
 
 /* Typing a phone number and a code */
 .otc-field { display: flex; gap: 10px; }

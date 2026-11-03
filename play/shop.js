@@ -368,6 +368,16 @@ var OTCShop = (function () {
         show(problemWindow(problem(e)));
       });
     };
+    if (insideApp() && !(me && kept("token"))) return win([
+      kicker("Giveaway · " + count.left + " of " + count.total + " left"),
+      title("All games, ", "free"),
+      para("We're giving away " + count.total + " free copies of every game. Get your own code and keep it."),
+      h("hr"),
+      button("Get my free code", "main", phoneCode),
+      fine("One per person. Nothing to pay, no card."),
+      link("Join us on Discord", discord),
+      link("Just play Fruit Slicer", closed),
+    ]);
     return win([
       kicker("Giveaway · " + count.left + " of " + count.total + " left"),
       title("All games, ", "free"),
@@ -381,6 +391,48 @@ var OTCShop = (function () {
       link("Join us on Discord", discord),
       link("Just play Fruit Slicer", closed),
     ]);
+  }
+
+  // Opened inside an app (TikTok, Instagram, Facebook…): Google refuses to sign people in there (owner, 2026-11-03), so the
+  // giveaway gives a code to keep instead, used later with the link in Safari, Chrome or on a computer (see giftWindow).
+  function insideApp() {
+    return /musical_ly|bytedance|tiktok|instagram|fban|fbav|fb_iab|messenger|snapchat|linkedinapp|pinterest|twitter/i.test(navigator.userAgent);
+  }
+
+  function phoneCode() {
+    show(waitWindow("Getting your code…"));
+    call("/api/giveaway/code", { device: device(), from: cameFrom(), visit: visit() }).then(function (r) {
+      say("took a free code on the phone");
+      show(phoneCodeWindow(r.code));
+    }, function (e) {
+      if (e && e.error === "gone") return giveawayLeftThen(function (count) { show(giveawayGoneWindow(count)); });
+      show(problemWindow(problem(e)));
+    });
+  }
+
+  function giveawayLeftThen(next) {
+    call("/api/giveaway").then(next, function () { next({ total: 100, left: 0 }); });
+  }
+
+  function phoneCodeWindow(code) {
+    var address = location.origin + location.pathname + "?code=" + code + "&from=" + (cameFrom() || "phone");
+    var note = "My free copy of Off the Couch (code " + code + "). Open on my computer in Chrome or Safari:";
+    var send = button("Send it to myself", "main", function () {
+      if (navigator.share) navigator.share({ title: "Off the Couch", text: note, url: address }).then(function () { say("sent the free code to themselves"); }, function () {});
+      else location.href = "mailto:?subject=" + encodeURIComponent("My free copy of Off the Couch") + "&body=" + encodeURIComponent(note + "\n" + address);
+    });
+    var copy = link("Copy the link", function () {
+      navigator.clipboard.writeText(address).then(function () { copy.textContent = "Copied"; }, function () { copy.textContent = address; });
+    });
+    return win([
+      kicker("Your free copy"),
+      title("Your ", "code"),
+      h("p", { class: "otc-code", text: code }),
+      para("Take a screenshot so you keep it. Then open the link on your computer (or in Safari or Chrome) and sign in with Google: every game opens."),
+      send,
+      copy,
+      fine("The games play with a camera, best on a computer."),
+    ], { center: true });
   }
 
   function giveawayGoneWindow(count) {
@@ -527,7 +579,9 @@ var OTCShop = (function () {
       show(waitWindow("Signing in…"));
       call("/api/google", { credential: credential, device: device() }).then(function (r) { next(signedIn(r)); }, function (e) { show(problemWindow(problem(e))); });
     };
-    google.accounts.id.renderButton(place, { theme: "filled_black", size: "large", shape: "pill", text: "continue_with", width: 400, logo_alignment: "center" });
+    // Google's button keeps the width it's given, so on a narrow phone it must be narrower than the window (2026-11-03).
+    var wide = Math.round(Math.max(200, Math.min(400, window.innerWidth - 110)));
+    google.accounts.id.renderButton(place, { theme: "filled_black", size: "large", shape: "pill", text: "continue_with", width: wide, logo_alignment: "center" });
     return place;
   }
 
