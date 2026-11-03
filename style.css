@@ -137,6 +137,10 @@ h1, h2, h3 { margin: 0; font-weight: 800; letter-spacing: -0.035em; line-height:
 /* The launch price on the first screen (until 15 November; site.js takes it away after). */
 .launch { display: inline-flex; flex-wrap: wrap; gap: 0 6px; margin-bottom: 18px; padding: 9px 16px; border-radius: 999px; background: rgba(255, 140, 66, 0.16); box-shadow: inset 0 0 0 1.5px var(--tangerine); color: #FFFFFF; font-weight: 700; text-decoration: none; }
 .launch b { color: var(--tangerine); }
+/* The giveaway (2026-11-03), under the launch price while copies are left (site.js shows it). */
+.launch.giveaway { display: flex; width: fit-content; margin-top: -8px; background: rgba(34, 184, 171, 0.16); box-shadow: inset 0 0 0 1.5px var(--teal); }
+.launch.giveaway b { color: var(--teal); }
+.launch.giveaway[hidden], .place[hidden] { display: none; }
 .price .say p { margin: 22px 0 0; max-width: 470px; font-size: 18px; color: rgba(255, 255, 255, 0.82); }
 .places { display: grid; gap: 10px; }
 .place { display: flex; align-items: center; gap: 14px; padding: 16px 18px; border-radius: 16px; background: rgba(255, 255, 255, 0.06); font-weight: 700; }

@@ -8,6 +8,11 @@ if (Date.now() >= Date.parse('2026-11-16T08:00:00Z')) {
   document.querySelectorAll('[data-usual]').forEach(e => { e.textContent = e.dataset.usual; });
 }
 
+// The giveaway's lines show only while free copies are left.
+fetch('https://api.cuzgames.com/api/giveaway').then(r => r.json()).then(g => {
+  if (g.left > 0) document.querySelectorAll('[data-giveaway]').forEach(e => { e.hidden = false; });
+}).catch(() => {});
+
 const REDUCE = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const HOVER = matchMedia('(hover: hover)').matches;
 
