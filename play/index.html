@@ -45,13 +45,14 @@
         border-radius: 22px; padding: 12px 22px; cursor: pointer; }
       /* Phones only (see "phone" below): a moving picture while the phone is held upright — a gold phone turning on
          its side — and the numbers in the corner */
-      #turn { display: none; position: fixed; inset: 0; z-index: 20; background: #1E1636; align-items: center; justify-content: center; }
+      #turn { display: none; position: fixed; inset: 0; z-index: 20; background: #1E1636; flex-direction: column; gap: 24px; align-items: center; justify-content: center; }
       #turn svg { width: 180px; height: 180px; overflow: visible; }
       #turn .phone { transform-origin: 90px 90px; animation: sideways 3.2s cubic-bezier(.5, 0, .3, 1) infinite; }
       #turn .tick { opacity: 0; animation: tick 3.2s linear infinite; }
       @keyframes sideways { 0%, 25% { transform: rotate(0); } 55%, 90% { transform: rotate(-90deg); } 100% { transform: rotate(0); } }
       @keyframes tick { 0%, 52% { opacity: 0; } 60%, 86% { opacity: 1; } 94%, 100% { opacity: 0; } }
       @media (orientation: portrait) { body.phone #turn { display: flex; } }
+      #turn p { margin: 0; padding: 0 24px; color: #FFC93C; text-align: center; font: 400 clamp(32px, 9vw, 52px)/1.15 "Caveat Brush", -apple-system, system-ui, sans-serif; }
       #numbers { display: none; position: fixed; left: 8px; top: 8px; z-index: 10; padding: 4px 8px; border-radius: 4px;
         background: rgba(43, 45, 66, .7); color: #FFFFFF; font: 600 11px/1.35 ui-monospace, Menlo, monospace;
         pointer-events: none; white-space: pre; }
@@ -144,6 +145,7 @@
         <g class="phone"><rect x="62" y="40" width="56" height="100" rx="12" fill="#2B1D4A" stroke="#FFC93C" stroke-width="7"/>
           <path class="tick" d="M75 90 l10 10 l20 -22" fill="none" stroke="#FFC93C" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" transform="rotate(90 90 90)"/></g>
       </svg>
+      <p id="turn-words">Turn your phone sideways to play</p>
     </div>
     <div id="numbers"></div>
     <button id="full" aria-label="Full screen"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2B1D4A" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5"/></svg></button>
@@ -175,6 +177,7 @@
         (navigator.maxTouchPoints > 1 && !matchMedia("(any-pointer: fine)").matches));
       if (phone) {
         document.body.classList.add("phone");
+        if (Math.min(screen.width, screen.height) >= 600) document.getElementById("turn-words").textContent = "Turn your tablet sideways to play";
         if (new URLSearchParams(location.search).has("numbers")) document.body.classList.add("numbers");
         if (!sharpness) config.devicePixelRatio = Math.min(window.devicePixelRatio, 2);
         var awake = function () {
