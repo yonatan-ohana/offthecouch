@@ -292,7 +292,8 @@ var OTCShop = (function () {
     var ref = "";
     try { ref = document.referrer ? new URL(document.referrer).hostname : ""; } catch (e) {}
     if (/(^|\.)(cuzgames|yo-software)\.com$/.test(ref)) ref = "";
-    var all = (location.search + " " + ref + " " + navigator.userAgent).toLowerCase(), from =
+    var paid = /[?&]from=(paid-[a-z0-9]+)/.exec(location.search); // a paid video's own link, so each one is counted apart
+    var all = (location.search + " " + ref + " " + navigator.userAgent).toLowerCase(), from = paid ? paid[1] :
       /tiktok|musical_ly|bytedance|ttclid/.test(all) ? "tiktok" : /instagram/.test(all) ? "instagram" :
       /facebook|fban|fbav|fbclid/.test(all) ? "facebook" : /youtube/.test(all) ? "youtube" : /google|gclid/.test(all) ? "google" :
       /itch\.io/.test(all) ? "itch" : /discord/.test(all) ? "discord" : /bing|duckduckgo|yahoo|ecosia/.test(all) ? "search" : ref ? "site" : "direct";
