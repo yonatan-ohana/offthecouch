@@ -163,6 +163,10 @@ function isTest() {
       start = Date.now();
       sessionStorage.setItem('otcStart', String(start));
       send('site', '', '', true);
+      // Which app's own browser this is: a paid link's mark replaces it in "from", and the camera can behave differently there.
+      const agent = navigator.userAgent, app = /musical_ly|bytedance|tiktok|trill/i.test(agent) ? 'TikTok' : /instagram/i.test(agent) ? 'Instagram' :
+        /fban|fbav|fb_iab/i.test(agent) ? 'Facebook' : /snapchat/i.test(agent) ? 'Snapchat' : /; wv\)/.test(agent) ? 'an app' : '';
+      if (app) send('say', '', 'inside ' + app, false);
     };
     const watch = () => {
       clearTimeout(timer);

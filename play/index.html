@@ -353,7 +353,9 @@
         try { seen = localStorage.getItem("otcPlayed") === "1"; } catch (e) {}
         document.body.classList.add("first");
         var page = document.getElementById("orchard"), button = document.getElementById("play"), label = button.querySelector("span");
-        var promise = document.getElementById("promise"), tapped = false, allowed = false, ready = false;
+        var promise = document.getElementById("promise"), tapped = false, allowed = false, ready = false, copying = false;
+        var agentNow = navigator.userAgent, app = /musical_ly|bytedance|tiktok|trill/i.test(agentNow) ? "TikTok" : /instagram/i.test(agentNow) ? "Instagram" :
+          /fban|fbav|fb_iab/i.test(agentNow) ? "Facebook" : /snapchat/i.test(agentNow) ? "Snapchat" : /; wv\)/.test(agentNow) ? "an app" : "";
         var tell = function (words) { if (window.OTCShop && OTCShop.say) OTCShop.say("page: " + words); };
         window.OTCPage = {
           firstVisit: !seen || forced,
@@ -364,13 +366,14 @@
         flying(page);
 
         button.onclick = function () {
+          if (copying) return copyLink();
           if (tapped) return;
           tapped = true;
           button.disabled = true;
           label.textContent = "Starting the camera...";
-          tell("tapped Play with your camera" + (seen && !forced ? " (back again)" : ""));
-          var media = navigator.mediaDevices;
-          if (!media || !media.getUserMedia) return refused("This browser has no camera to give. Try Chrome.");
+          tell("tapped Play with your camera" + (seen && !forced ? " (back again)" : "") + (app ? " inside " + app : ""));
+          var media = navigator.mediaDevices, askedAt = Date.now();
+          if (!media || !media.getUserMedia) return app ? insideAnApp() : refused("This browser has no camera to give. Try Chrome.");
           media.getUserMedia({ audio: false, video: { width: { ideal: 1280 }, height: { ideal: 720 }, frameRate: { ideal: 30 } } })
             .then(function (stream) {
               allowed = true;
@@ -381,11 +384,61 @@
               label.textContent = "Getting the fruit ready...";
               lift();
             }, function (error) {
-              refused(error && error.name === "NotAllowedError"
-                ? "The camera is blocked. Click the camera sign in the address bar, choose Allow, then tap the button again."
-                : "No camera was found, or another app is using it. Close that app, then tap the button again.");
+              whyRefused(error, Date.now() - askedAt);
             });
         };
+
+        // Each way the camera can be refused has its own way out, all tried on an Android phone in Chrome (2026-11-04).
+        // A question on screen takes seconds to answer; a refusal with no question comes back at once. Tapping away from
+        // Chrome's question leaves it asking again, twice; after that, or after "Never allow", Chrome stops asking, with
+        // nothing in the address bar on the third, and its site panel is the way back. "Don't allow" on Android's own
+        // question for Chrome, twice, leaves that panel with no camera line: only the phone's settings help.
+        function whyRefused(error, waited) {
+          if (app) return insideAnApp();
+          if (!error || error.name !== "NotAllowedError")
+            return refused("No camera was found, or another app is using it. Close that app, then tap the button again.");
+          var agent = navigator.userAgent;
+          if (/iPhone|iPad/.test(agent) || (/Macintosh/.test(agent) && navigator.maxTouchPoints > 1))
+            return refused("The camera is blocked. Reload this page, then choose Allow.");
+          if (!/Android/.test(agent))
+            return refused("The camera is blocked. Click the camera sign in the address bar, choose Allow, then tap the button again.");
+          var answer = function (state) {
+            if (state === "denied")
+              refused("The camera is blocked. Tap the sign left of the web address, tap Permissions, turn on Camera, then reload this page.");
+            else if (waited < 1000)
+              refused("Your phone is blocking this browser from the camera. In your phone's Settings, open Apps, this browser, Permissions, and allow Camera. Then reload this page.");
+            else refused("The camera is off. Tap Try again, then say yes each time your phone asks.");
+          };
+          if (!navigator.permissions) return answer("");
+          navigator.permissions.query({ name: "camera" }).then(function (p) { answer(p.state); }, function () { answer(""); });
+        }
+
+        // An app's own browser may keep the camera for itself, and there is no address bar to fix it from. The button
+        // now copies the link, with a paid video's mark, so that visit still counts for it.
+        function insideAnApp() {
+          refused("The camera is blocked in this app. Copy the link and open it in Chrome or Safari.");
+          copying = true;
+          label.textContent = "Copy the link";
+        }
+        function copyLink() {
+          var from = "", link = location.origin + location.pathname;
+          try { from = sessionStorage.getItem("otcFrom") || ""; } catch (e) {}
+          if (/^paid-[a-z0-9]+$/.test(from)) link += "?from=" + from;
+          var worked = function () { label.textContent = "Copied: paste it in Chrome or Safari"; };
+          var failed = function () { promise.querySelector("span").textContent = "Open this address in Chrome or Safari: " + link; };
+          var oldWay = function () { // apps' own browsers often refuse the new way
+            var box = document.createElement("textarea"), done = false;
+            box.value = link;
+            box.style.cssText = "position:fixed;opacity:0";
+            document.body.appendChild(box);
+            box.select();
+            try { done = document.execCommand("copy"); } catch (e) {}
+            box.remove();
+            if (done) worked(); else failed();
+          };
+          if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(link).then(worked, oldWay);
+          else oldWay();
+        }
 
         function refused(words) {
           tapped = false;
@@ -495,7 +548,9 @@
             document.getElementById("loading").remove();
             document.querySelector("#unity-canvas").focus(); // keys reach the game without a click first
           }).catch(function (message) {
-            document.querySelector("#loading p").textContent = message;
+            // The game's own message is a wall of code; say what to do, and keep what went wrong for the visit's story.
+            document.querySelector("#loading p").textContent = "The game did not start. Check your internet, then reload this page.";
+            if (window.OTCShop && OTCShop.say) OTCShop.say("game failed: " + String(message).slice(0, 60));
             document.body.classList.add("failed");
           });
         };
