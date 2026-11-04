@@ -10,169 +10,178 @@
 <meta property="og:image" content="https://offthecouch.cuzgames.com/img/share.jpg">
 <meta property="og:url" content="https://offthecouch.cuzgames.com/">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="theme-color" content="#0B0D18">
+<meta name="theme-color" content="#1E1636">
 <link rel="icon" href="favicon.png">
 <link rel="preload" href="fonts/CaveatBrush-Regular.ttf" as="font" type="font/ttf" crossorigin>
+<link rel="preload" href="fonts/Nunito-Bold.ttf" as="font" type="font/ttf" crossorigin>
+<link rel="preload" href="video/play/fruit-slicer.jpg" as="image">
 <link rel="stylesheet" href="style.css">
-<script>
-document.documentElement.classList.add('js');
-// Phones and tablets: the page marks them, so the game's print beside the player is left out (it covers the text there).
-(function () {
-  var ua = navigator.userAgent, data = navigator.userAgentData;
-  var phone = (data && data.mobile) || /iPhone|iPad|iPod|Android/i.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1);
-  if (phone) document.documentElement.classList.add('phone');
-})();
-</script>
 </head>
 <body>
-<header class="top">
-  <div class="wrap">
-    <a class="brand" href="./"><img src="img/icon.png" alt="">Off the Couch</a>
-    <nav aria-label="Main"><a href="#games">Games</a><a href="#how">How it works</a><a href="#price">Price</a><a href="#help">Help</a></nav>
-    <a class="btn btn-main btn-small" href="play/">Play free</a>
-  </div>
-</header>
-
 <main>
-<section class="hero">
-  <video src="video/hero.mp4" poster="video/hero.jpg" autoplay muted loop playsinline></video>
-  <p class="ai-tag">The people in this video are AI-made. The game on screen is real.</p>
-  <div class="wrap hero-in">
-    <!-- Straight to the point: play now, on any screen, with one big glowing button (owner's mix of three drafts, 2026-10-30). -->
-    <div>
-      <a class="launch" href="#price" data-launch>Launch price: all games <b>$3.99</b> <s>$7.99</s> until 15 November</a>
-      <a class="launch giveaway" href="play/?free" data-giveaway hidden>Giveaway: a free copy of all 8 games <b>Get yours →</b></a>
-      <h1><span>Play now.</span><br>No app. No controller.</h1>
-      <p class="lead">Wave, duck and jump in front of your camera. Right in your browser, Chrome or Safari.</p>
-      <div class="screens">
-        <div><svg aria-hidden="true" viewBox="0 0 24 24"><rect x="7" y="2.5" width="10" height="19" rx="2.2" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="18.3" r="0.9" fill="currentColor"/></svg><b>Phone</b><small>iPhone · Android</small></div>
-        <div><svg aria-hidden="true" viewBox="0 0 24 24"><rect x="3.5" y="3" width="17" height="18" rx="2.2" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="18.2" r="0.9" fill="currentColor"/></svg><b>Tablet</b><small>iPad · Android</small></div>
-        <div><svg aria-hidden="true" viewBox="0 0 24 24"><rect x="4.5" y="5" width="15" height="10.5" rx="1.4" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M2 18.5h20" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg><b>Computer</b><small>Mac · Windows</small></div>
-        <div><svg aria-hidden="true" viewBox="0 0 24 24"><rect x="2.5" y="4" width="19" height="12.5" rx="1.6" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M8 20h8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg><b>TV</b><small>through a laptop</small></div>
-      </div>
-      <a class="btn btn-main btn-huge btn-wide pulse" href="play/"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24"><path d="M7 4l13 8-13 8z" fill="currentColor"/></svg>Play free now</a>
-      <p class="fine">The camera pictures never leave your device.</p>
+<!-- The first screen is the game's own menu: same stage, title notes, cards, sale tag and bottom strip. -->
+<section class="stage" id="games">
+  <div class="room">
+    <div class="light"></div>
+    <div class="floor"></div>
+
+    <nav class="pills left" aria-label="Main">
+      <a class="pill" href="#how"><span class="ic" style="--i:url(img/stage/hand.png)"></span>How it works</a>
+      <a class="pill" href="#price"><span class="ic" style="--i:url(img/stage/star.png)"></span>Price</a>
+    </nav>
+    <nav class="pills right" aria-label="More">
+      <a class="pill" href="#help">Help</a>
+      <a class="pill" href="play/?signin"><small>Bought it?</small>Log in</a>
+    </nav>
+
+    <div class="title notes" role="img" aria-label="Off the Couch">
+      <span class="note off">Off</span><span class="note the">the</span><span class="note couch">Couch</span>
     </div>
-  </div>
-  <a class="hero-game" href="play/" aria-label="Play Fruit Slicer"><img src="img/hero-game.jpg" alt="Fruit Slicer: fruit flies across a paper landscape and splats when sliced" width="640" height="390"></a>
-</section>
 
-<div class="roll" aria-hidden="true"><div><span>Slice</span><span>Run</span><span>Fly</span><span>Ski</span><span>Save</span><span>Pose</span><span>Flap</span><span>Balance</span><span>Slice</span><span>Run</span><span>Fly</span><span>Ski</span><span>Save</span><span>Pose</span><span>Flap</span><span>Balance</span></div></div>
-
-<section class="wrap block" id="games">
-  <div class="head rise">
-    <div><p class="kicker">The games</p><h2>Pick a game.<br><span>Then move.</span></h2></div>
-    <p class="sub">Every game is played standing up, with your arms, your legs and your whole body. Point at a game to watch someone play it.</p>
-  </div>
-  <ul class="grid">
-    <li class="card big rise">
-      <video class="play" muted loop playsinline preload="none" poster="video/play/fruit-slicer.jpg" src="video/play/fruit-slicer.mp4"></video>
-      <div class="cam"><video muted loop playsinline preload="none" poster="video/people/fruit-slicer.jpg" src="video/people/fruit-slicer.mp4"></video><em>AI-made player</em></div>
-      <div class="about"><span class="tag free">Free</span><h3>Fruit Slicer</h3><p>Slice fruit with your hands.</p><a class="btn btn-main btn-small" href="play/">Play free now</a></div>
-    </li>
-    <li class="card rise">
-      <video class="play" muted loop playsinline preload="none" poster="video/play/body-runner.jpg" src="video/play/body-runner.mp4"></video>
-      <div class="cam"><video muted loop playsinline preload="none" poster="video/people/body-runner.jpg" src="video/people/body-runner.mp4"></video><em>AI-made player</em></div>
-      <div class="about"><span class="tag lock">Unlock</span><h3>Body Runner</h3><p>Jump, duck and dodge down the road.</p></div>
-    </li>
-    <li class="card rise">
-      <video class="play" muted loop playsinline preload="none" poster="video/play/airplane.jpg" src="video/play/airplane.mp4"></video>
-      <div class="cam"><video muted loop playsinline preload="none" poster="video/people/airplane.jpg" src="video/people/airplane.mp4"></video><em>AI-made player</em></div>
-      <div class="about"><span class="tag lock">Unlock</span><h3>Airplane</h3><p>Spread your arms and fly through the rings.</p></div>
-    </li>
-    <li class="card rise">
-      <video class="play" muted loop playsinline preload="none" poster="video/play/ski-slalom.jpg" src="video/play/ski-slalom.mp4"></video>
-      <div class="cam"><video muted loop playsinline preload="none" poster="video/people/ski-slalom.jpg" src="video/people/ski-slalom.mp4"></video><em>AI-made player</em></div>
-      <div class="about"><span class="tag lock">Unlock</span><h3>Ski Slalom</h3><p>Lean into every turn, crouch for speed.</p></div>
-    </li>
-    <li class="card rise">
-      <video class="play" muted loop playsinline preload="none" poster="video/play/goalkeeper.jpg" src="video/play/goalkeeper.mp4"></video>
-      <div class="cam"><video muted loop playsinline preload="none" poster="video/people/goalkeeper.jpg" src="video/people/goalkeeper.mp4"></video><em>AI-made player</em></div>
-      <div class="about"><span class="tag lock">Unlock</span><h3>Goalkeeper</h3><p>Reach and step to stop every shot.</p></div>
-    </li>
-    <li class="card rise">
-      <video class="play" muted loop playsinline preload="none" poster="video/play/hole-in-the-wall.jpg" src="video/play/hole-in-the-wall.mp4"></video>
-      <div class="cam"><video muted loop playsinline preload="none" poster="video/people/hole-in-the-wall.jpg" src="video/people/hole-in-the-wall.mp4"></video><em>AI-made player</em></div>
-      <div class="about"><span class="tag lock">Unlock</span><h3>Hole in the Wall</h3><p>Strike the pose before the wall arrives.</p></div>
-    </li>
-    <li class="card rise">
-      <video class="play" muted loop playsinline preload="none" poster="video/play/bird-flap.jpg" src="video/play/bird-flap.mp4"></video>
-      <div class="cam"><video muted loop playsinline preload="none" poster="video/people/bird-flap.jpg" src="video/people/bird-flap.mp4"></video><em>AI-made player</em></div>
-      <div class="about"><span class="tag lock">Unlock</span><h3>Bird Flap</h3><p>Flap your arms to keep the bird flying.</p></div>
-    </li>
-    <li class="card rise">
-      <video class="play" muted loop playsinline preload="none" poster="video/play/tightrope.jpg" src="video/play/tightrope.mp4"></video>
-      <div class="cam"><video muted loop playsinline preload="none" poster="video/people/tightrope.jpg" src="video/people/tightrope.mp4"></video><em>AI-made player</em></div>
-      <div class="about"><span class="tag lock">Unlock</span><h3>Tightrope</h3><p>Keep your balance high above the town.</p></div>
-    </li>
-    <li class="card more rise"><span class="plus">+</span><h3>New games join here</h3><p>One purchase opens every game we add later.</p></li>
-  </ul>
-</section>
-
-<section class="wrap block" id="how">
-  <div class="how">
-    <div class="how-clip rise"><video src="video/people/ski-slalom.mp4" poster="video/people/ski-slalom.jpg" muted loop playsinline preload="none"></video><span>About 2 metres from the screen · AI-made player</span></div>
-    <div class="rise">
-      <p class="kicker">How it works</p>
-      <h2>Your body is<br>the controller.</h2>
-      <div class="step"><b>01</b><h3>Make some room</h3><p>Clear about 2 metres around you. Mind furniture, pets and little ones.</p></div>
-      <div class="step"><b>02</b><h3>Let the camera see you</h3><p>Step back until your whole upper body is in the picture, with light in front of you.</p></div>
-      <div class="step"><b>03</b><h3>Move to play</h3><p>Slice, jump, lean and flap. The game follows every move.</p></div>
-    </div>
-  </div>
-  <div class="trust rise">
-    <div><b>No controller</b><span>Just you and the camera you already have.</span></div>
-    <div><b>Nothing to install</b><span>Fruit Slicer plays right in your browser.</span></div>
-    <div><b>Your camera stays private</b><span>The pictures never leave your device.</span></div>
-  </div>
-</section>
-
-<section class="wrap block" id="price">
-  <div class="price rise">
     <div class="say">
-      <p class="kicker">One price, paid once</p>
-      <h2>All games <span data-usual="$7.99">$3.99</span></h2>
-      <p class="launch-note" data-launch>Launch price until 15 November. Usually <s>$7.99</s>.</p>
-      <p>Fruit Slicer is free. One purchase opens all the other games, and every new game later. No subscription, no ads, and playing free needs no sign-in.</p>
+      <h1 class="hand">Play now.<span>No app.<br>No controller.</span></h1>
+      <p>Wave, duck and jump in front of your camera. Right in your browser, Chrome or Safari.</p>
+      <a class="gift" href="play/?free" data-giveaway hidden>Giveaway: a free copy of all 8 games <b>Get yours →</b></a>
     </div>
-    <div class="places">
-      <a class="place main" href="play/?unlock">Unlock in your browser <span class="go" data-usual="$7.99 →">$3.99 →</span></a>
-      <a class="place" href="play/?free" data-giveaway hidden>Giveaway: free copies <span class="go">Get yours →</span></a>
-      <a class="place" href="https://discord.gg/fHxH9XVwNA" target="_blank" rel="noopener">News and scores <span class="go">Join our Discord →</span></a>
-      <div class="place">Mac App Store <span class="soon">Coming soon</span></div>
-      <div class="place">App Store for iPad <span class="soon">Coming soon</span></div>
-      <div class="place">Steam for Windows <span class="soon">Coming soon</span></div>
-      <a class="signin-line" href="play/?signin">Already bought? Sign in</a>
-      <p class="fine">Each place keeps its own purchase: buying in the browser opens the games in the browser.</p>
+
+    <div class="deck" id="deck">
+      <article class="card open" data-free="1">
+        <div class="pic"><img src="video/play/fruit-slicer.jpg" alt="Fruit Slicer being played"><video muted loop playsinline preload="none" data-src="video/play/fruit-slicer.mp4"></video><span class="free">FREE</span>
+          <div class="player"><img src="video/people/fruit-slicer.jpg" alt=""><video muted loop playsinline preload="none" data-src="video/people/fruit-slicer.mp4"></video><em>AI-made player</em></div></div>
+        <div class="words"><h2 class="hand">Fruit Slicer</h2><p>Slice the flying fruit with your hands</p></div>
+        <span class="ribbon">START HERE · NO SIGN-IN</span><span class="burst hand">FREE</span>
+      </article>
+      <article class="card" data-free="">
+        <div class="pic"><img src="video/play/body-runner.jpg" alt="Body Runner being played"><video muted loop playsinline preload="none" data-src="video/play/body-runner.mp4"></video><span class="padlock"><span class="ic" style="--i:url(img/stage/lock.png)"></span></span>
+          <div class="player"><img src="video/people/body-runner.jpg" alt=""><video muted loop playsinline preload="none" data-src="video/people/body-runner.mp4"></video><em>AI-made player</em></div></div>
+        <div class="words"><h2 class="hand">Body Runner</h2><p>Run on the spot, jump and duck</p></div>
+      </article>
+      <article class="card" data-free="">
+        <div class="pic"><img src="video/play/airplane.jpg" alt="Airplane being played"><video muted loop playsinline preload="none" data-src="video/play/airplane.mp4"></video><span class="padlock"><span class="ic" style="--i:url(img/stage/lock.png)"></span></span>
+          <div class="player"><img src="video/people/airplane.jpg" alt=""><video muted loop playsinline preload="none" data-src="video/people/airplane.mp4"></video><em>AI-made player</em></div></div>
+        <div class="words"><h2 class="hand">Airplane</h2><p>Your arms are the wings</p></div>
+      </article>
+      <article class="card" data-free="">
+        <div class="pic"><img src="video/play/ski-slalom.jpg" alt="Ski Slalom being played" loading="lazy"><video muted loop playsinline preload="none" data-src="video/play/ski-slalom.mp4"></video><span class="padlock"><span class="ic" style="--i:url(img/stage/lock.png)"></span></span>
+          <div class="player"><img src="video/people/ski-slalom.jpg" alt="" loading="lazy"><video muted loop playsinline preload="none" data-src="video/people/ski-slalom.mp4"></video><em>AI-made player</em></div></div>
+        <div class="words"><h2 class="hand">Ski Slalom</h2><p>Lean and crouch down the slope</p></div>
+      </article>
+      <article class="card" data-free="">
+        <div class="pic"><img src="video/play/goalkeeper.jpg" alt="Goalkeeper being played" loading="lazy"><video muted loop playsinline preload="none" data-src="video/play/goalkeeper.mp4"></video><span class="padlock"><span class="ic" style="--i:url(img/stage/lock.png)"></span></span>
+          <div class="player"><img src="video/people/goalkeeper.jpg" alt="" loading="lazy"><video muted loop playsinline preload="none" data-src="video/people/goalkeeper.mp4"></video><em>AI-made player</em></div></div>
+        <div class="words"><h2 class="hand">Goalkeeper</h2><p>Stop the shots with your hands</p></div>
+      </article>
+      <article class="card" data-free="">
+        <div class="pic"><img src="video/play/hole-in-the-wall.jpg" alt="Hole in the Wall being played" loading="lazy"><video muted loop playsinline preload="none" data-src="video/play/hole-in-the-wall.mp4"></video><span class="padlock"><span class="ic" style="--i:url(img/stage/lock.png)"></span></span>
+          <div class="player"><img src="video/people/hole-in-the-wall.jpg" alt="" loading="lazy"><video muted loop playsinline preload="none" data-src="video/people/hole-in-the-wall.mp4"></video><em>AI-made player</em></div></div>
+        <div class="words"><h2 class="hand">Hole in the Wall</h2><p>Make the shape and fit through</p></div>
+      </article>
+      <article class="card" data-free="">
+        <div class="pic"><img src="video/play/bird-flap.jpg" alt="Bird Flap being played" loading="lazy"><video muted loop playsinline preload="none" data-src="video/play/bird-flap.mp4"></video><span class="padlock"><span class="ic" style="--i:url(img/stage/lock.png)"></span></span>
+          <div class="player"><img src="video/people/bird-flap.jpg" alt="" loading="lazy"><video muted loop playsinline preload="none" data-src="video/people/bird-flap.mp4"></video><em>AI-made player</em></div></div>
+        <div class="words"><h2 class="hand">Bird Flap</h2><p>Flap your arms to fly</p></div>
+      </article>
+      <article class="card" data-free="">
+        <div class="pic"><img src="video/play/tightrope.jpg" alt="Tightrope being played" loading="lazy"><video muted loop playsinline preload="none" data-src="video/play/tightrope.mp4"></video><span class="padlock"><span class="ic" style="--i:url(img/stage/lock.png)"></span></span>
+          <div class="player"><img src="video/people/tightrope.jpg" alt="" loading="lazy"><video muted loop playsinline preload="none" data-src="video/people/tightrope.mp4"></video><em>AI-made player</em></div></div>
+        <div class="words"><h2 class="hand">Tightrope</h2><p>Balance with your arms out</p></div>
+      </article>
+      <button class="arrow prev" id="prev" aria-label="Previous game"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15.5 4l-8.5 8 8.5 8" fill="none" stroke="currentColor" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <button class="arrow next" id="next" aria-label="Next game"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8.5 4l8.5 8-8.5 8" fill="none" stroke="currentColor" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    </div>
+
+    <div class="go" id="go"><a class="gold big green" href="play/">Play free</a></div>
+    <a class="freego" href="play/">Play Fruit Slicer free</a>
+    <div class="dots" id="dots"></div>
+
+    <a class="sale" href="play/?unlock" data-launch>
+      <span class="sticker hand">-50%</span>
+      <small>LAUNCH SALE</small>
+      <b class="hand">All 8 games</b>
+      <span class="now hand">$3.99 <s>$7.99</s></span>
+      <small>until 15 November</small>
+    </a>
+
+    <div class="strip">
+      <span class="ic" style="--i:url(img/stage/camera.png)"></span><i></i>
+      <b class="hand">The camera pictures never leave your device.</b>
+      <div class="devices">
+        <span><svg aria-hidden="true" viewBox="0 0 24 24"><rect x="7" y="2.5" width="10" height="19" rx="2.2" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="18.3" r="0.9" fill="currentColor"/></svg>Phone</span>
+        <span><svg aria-hidden="true" viewBox="0 0 24 24"><rect x="3.5" y="3" width="17" height="18" rx="2.2" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="18.2" r="0.9" fill="currentColor"/></svg>Tablet</span>
+        <span><svg aria-hidden="true" viewBox="0 0 24 24"><rect x="4.5" y="5" width="15" height="10.5" rx="1.4" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M2 18.5h20" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>Computer</span>
+        <span><svg aria-hidden="true" viewBox="0 0 24 24"><rect x="2.5" y="4" width="19" height="12.5" rx="1.6" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M8 20h8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>TV</span>
+      </div>
     </div>
   </div>
 </section>
 
-<section class="wrap block" id="help">
-  <div class="help">
-    <div class="rise">
-      <p class="kicker">Help</p>
-      <h2>Questions?</h2>
-      <p class="sub">Something else? Write to <a href="mailto:support@cuzgames.com">support@cuzgames.com</a> and tell us what you see.</p>
+<section class="block wrap" id="how">
+  <h2 class="big-word hand">Your body is the controller.</h2>
+  <div class="steps">
+    <div class="step">
+      <div class="art"><img src="img/stage/furniture.png" alt="A sofa and a cat" loading="lazy"></div>
+      <h3 class="hand">Make some room</h3>
+      <p>Clear about 2 metres around you. Mind furniture, pets and little ones.</p>
     </div>
-    <div class="rise">
-      <details><summary>The game can't see me.</summary><p>Stand where your whole upper body is in the camera picture, with good light in front of you, not behind you.</p></details>
-      <details><summary>What do I need?</summary><p>A phone or tablet, or a computer with a camera, in Chrome or Safari. Then about 2 metres of space.</p></details>
-      <details><summary>The camera is off.</summary><p>In Chrome: click the icon at the left end of the address bar and turn on "Camera". In Safari, or on a phone or tablet: open this website's settings from the address bar and allow the camera.</p></details>
-      <details><summary>I bought the games before.</summary><p>In the browser: choose "Already bought? Sign in" under the price on this page, or "Already bought? Log in" on the game's menu, and sign in the way you did when you bought. In the Mac app: choose "Settings" on the menu, then "Restore purchase".</p></details>
+    <div class="step">
+      <div class="art"><img src="img/stage/room.png" alt="A person standing in a circle" loading="lazy"></div>
+      <h3 class="hand">Let the camera see you</h3>
+      <p>Step back until your whole upper body is in the picture, with light in front of you.</p>
+    </div>
+    <div class="step">
+      <div class="art"><span class="disc"><span class="ic" style="--i:url(img/stage/play.png)"></span></span></div>
+      <h3 class="hand">Move to play</h3>
+      <p>Slice, jump, lean and flap. The game follows every move.</p>
     </div>
   </div>
+  <div class="clip">
+    <video src="video/people/ski-slalom.mp4" poster="video/people/ski-slalom.jpg" muted loop playsinline preload="none"></video>
+    <em>AI-made player · about 2 metres from the screen</em>
+  </div>
+</section>
+
+<section class="block wrap" id="price">
+  <div class="price">
+    <div class="tag-big">
+      <span class="sticker hand" data-launch>-50%</span>
+      <small data-usual="ONE PRICE, PAID ONCE">LAUNCH SALE</small>
+      <b class="hand">All 8 games</b>
+      <span class="now hand"><span data-usual="$7.99">$3.99</span> <s data-launch>$7.99</s></span>
+      <small data-launch>until 15 November</small>
+      <p>Paid once. No subscription, no ads.</p>
+    </div>
+    <div>
+      <div class="rows">
+        <a class="row gold-row" href="play/?unlock"><span class="hand">Unlock in your browser</span><span class="hand" data-usual="$7.99">$3.99</span></a>
+        <a class="row" href="play/?free" data-giveaway hidden><span class="hand">Giveaway: free copies</span><em>Get yours</em></a>
+        <a class="row" href="https://discord.gg/fHxH9XVwNA" target="_blank" rel="noopener"><span class="hand">News and scores</span><em>Join our Discord</em></a>
+        <div class="row"><span class="hand">Mac App Store</span><em>Coming soon</em></div>
+        <div class="row"><span class="hand">App Store for iPad</span><em>Coming soon</em></div>
+        <div class="row"><span class="hand">Steam for Windows</span><em>Coming soon</em></div>
+      </div>
+      <a class="signin-line" href="play/?signin">Already bought? Sign in</a>
+      <p class="fine">Fruit Slicer is free. One purchase opens all the other games, and every new game later. Playing free needs no sign-in. Each place keeps its own purchase: buying in the browser opens the games in the browser.</p>
+    </div>
+  </div>
+</section>
+
+<section class="block wrap help" id="help">
+  <h2 class="big-word hand">Questions?</h2>
+  <details><summary>The game can't see me.</summary><p>Stand where your whole upper body is in the camera picture, with good light in front of you, not behind you.</p></details>
+  <details><summary>What do I need?</summary><p>A phone or tablet, or a computer with a camera, in Chrome or Safari. Then about 2 metres of space.</p></details>
+  <details><summary>The camera is off.</summary><p>In Chrome: click the icon at the left end of the address bar and turn on "Camera". In Safari, or on a phone or tablet: open this website's settings from the address bar and allow the camera.</p></details>
+  <details><summary>I bought the games before.</summary><p>In the browser: choose "Already bought? Sign in" under the price on this page, or "Already bought? Log in" on the game's menu, and sign in the way you did when you bought. In the Mac app: choose "Settings" on the menu, then "Restore purchase".</p></details>
+  <p class="write">Something else? Write to <a href="mailto:support@cuzgames.com">support@cuzgames.com</a></p>
 </section>
 </main>
 
 <footer class="foot">
   <div class="wrap">
-    <a class="brand" href="./"><img src="img/icon.png" alt="">Off the Couch</a>
+    <a class="logo" href="https://cuzgames.com"><img src="img/cuz-logo.webp" alt="Cuz Games" width="62" height="62"></a>
     <a href="terms.html">Terms</a><a href="refunds.html">Refunds</a><a href="privacy.html">Privacy</a><a href="contact.html">Contact</a><a href="play/?signin">Sign in</a><a href="accessibility.html">Accessibility</a><a href="credits.html">Credits</a><a href="https://discord.gg/fHxH9XVwNA" target="_blank" rel="noopener">Discord</a>
     <span class="by">Made by Cuz Games · <a href="mailto:support@cuzgames.com">support@cuzgames.com</a></span>
   </div>
 </footer>
-
 
 <script src="site.js"></script>
 <!-- Counts visits without cookies (Cloudflare Web Analytics; see privacy.html) -->

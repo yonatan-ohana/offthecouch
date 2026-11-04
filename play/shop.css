@@ -1,26 +1,27 @@
-/* The play page's shop windows (see shop.js), in the website's own dark look: its colours, buttons and cards. */
-.otc-veil { --teal: #22B8AB; --tangerine: #FF8C42; --card: #161A31; --line: rgba(255, 255, 255, 0.09); --muted: #A4A9C6;
+/* The play page's shop windows (see shop.js), in the look of the game's menu and the website: velvet card, gold button, the game's lettering. */
+@font-face { font-family: "OTC Brush"; src: url("../fonts/CaveatBrush-Regular.ttf") format("truetype"); font-display: swap; }
+@font-face { font-family: "OTC Nunito"; src: url("../fonts/Nunito-Bold.ttf") format("truetype"); font-weight: 700; font-display: swap; }
+.otc-veil { --gold: #FFC93C; --ink: #2B1D4A; --card: #3A2F5C; --line: rgba(255, 255, 255, 0.14); --muted: #B9AED8;
   position: fixed; inset: 0; z-index: 1000; display: grid; place-items: center; box-sizing: border-box; padding: 24px; overflow-y: auto;
-  background: rgba(11, 13, 24, 0.74); -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px);
-  font: 400 17px/1.6 system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; color: #FFFFFF; -webkit-font-smoothing: antialiased; }
+  background: rgba(30, 22, 54, 0.74); -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px);
+  font: 700 17px/1.6 "OTC Nunito", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; color: #FFFFFF; -webkit-font-smoothing: antialiased; }
 .otc-veil[hidden] { display: none; }
 .otc-veil * { box-sizing: border-box; }
 
 /* Our window */
 .otc-win { position: relative; width: min(520px, 100%); padding: 40px 44px 34px; border-radius: 28px; display: flex; flex-direction: column; gap: 15px;
-  background: radial-gradient(120% 120% at 0% 0%, rgba(34, 184, 171, 0.24) 0%, rgba(34, 184, 171, 0) 55%), radial-gradient(90% 110% at 100% 100%, rgba(255, 140, 66, 0.16) 0%, rgba(255, 140, 66, 0) 55%), var(--card);
-  box-shadow: inset 0 0 0 1.5px rgba(255, 255, 255, 0.08), 0 40px 90px rgba(0, 0, 0, 0.55); text-align: left; }
+  background: var(--card); box-shadow: 0 7px 0 rgba(0, 0, 0, 0.3), 0 40px 90px rgba(0, 0, 0, 0.55); text-align: left; }
 .otc-win.otc-center { align-items: center; text-align: center; }
 .otc-win.otc-wide { width: min(600px, 100%); }
-.otc-win h2 { margin: 0; font-size: 46px; font-weight: 800; letter-spacing: -0.035em; line-height: 0.95; }
-.otc-win h2 span { color: var(--tangerine); }
-.otc-win p { margin: 0; font-size: 18px; line-height: 1.5; color: rgba(255, 255, 255, 0.82); }
-.otc-win .otc-kicker { margin-bottom: -4px; font-size: 13px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: var(--teal); }
+.otc-win h2 { margin: 0; font: 400 52px/1 "OTC Brush", cursive; color: #FFFFFF; }
+.otc-win h2 span { color: var(--gold); }
+.otc-win p { margin: 0; font-size: 18px; line-height: 1.5; color: #DAD3EC; }
+.otc-win .otc-kicker { margin-bottom: -4px; font-size: 13px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: var(--gold); }
 .otc-win .otc-ask { font-weight: 700; color: #FFFFFF; }
 .otc-win .otc-fine { font-size: 15px; text-align: center; color: var(--muted); }
 .otc-win .otc-error { font-size: 15px; font-weight: 600; color: #FF9A9A; }
 .otc-win .otc-error:empty { display: none; }
-.otc-win .otc-pretend { padding: 10px 14px; border-radius: 12px; background: rgba(34, 184, 171, 0.14); font-size: 15px; text-align: center; color: #9BE7DF; }
+.otc-win .otc-pretend { padding: 10px 14px; border-radius: 12px; background: rgba(255, 201, 60, 0.14); font-size: 15px; text-align: center; color: var(--gold); }
 .otc-win hr { width: 100%; height: 1px; margin: 2px 0; border: 0; background: var(--line); }
 .otc-x { position: absolute; top: 18px; right: 18px; width: 40px; height: 40px; display: grid; place-items: center; padding: 0; border: 0; border-radius: 50%;
   background: rgba(255, 255, 255, 0.1); color: #FFFFFF; cursor: pointer; }
@@ -28,19 +29,19 @@
 
 /* Buttons, as on the website */
 .otc-btn { display: inline-flex; align-items: center; justify-content: center; gap: 10px; width: 100%; height: 58px; padding: 0 22px; border: 0; border-radius: 999px;
-  font: 700 17px/1 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; text-decoration: none; cursor: pointer; transition: background 0.2s, opacity 0.2s; }
+  font: 400 26px/1 "OTC Brush", system-ui, sans-serif; text-decoration: none; cursor: pointer; transition: background 0.2s, opacity 0.2s; }
 .otc-btn:disabled { opacity: 0.55; cursor: default; }
-.otc-veil :focus-visible { outline: 3px solid rgba(34, 184, 171, 0.7); outline-offset: 3px; }
-.otc-main { background: var(--teal); color: #03211E; box-shadow: 0 14px 36px -12px rgba(34, 184, 171, 0.8); }
-.otc-main:hover:not(:disabled) { background: #31CBBE; }
-.otc-glass { background: rgba(255, 255, 255, 0.1); color: #FFFFFF; box-shadow: inset 0 0 0 1.5px rgba(255, 255, 255, 0.3); }
-.otc-glass:hover:not(:disabled) { background: rgba(255, 255, 255, 0.18); }
+.otc-veil :focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
+.otc-main { background: var(--gold); color: var(--ink); box-shadow: 0 5px 0 rgba(0, 0, 0, 0.35); }
+.otc-main:hover:not(:disabled) { background: #FFD766; }
+.otc-glass { background: #4A3E70; color: #FFFFFF; box-shadow: 0 5px 0 rgba(0, 0, 0, 0.3); }
+.otc-glass:hover:not(:disabled) { background: #574A82; }
 .otc-google { background: #131314; color: #E3E3E3; box-shadow: inset 0 0 0 1.5px #8E918F; }
 .otc-red { background: #E5484D; color: #FFFFFF; }
 .otc-redline { background: transparent; color: #FF7A7A; box-shadow: inset 0 0 0 1.5px rgba(255, 122, 122, 0.6); }
 .otc-two { display: flex; gap: 12px; margin-top: 4px; }
 .otc-two .otc-btn { flex: 1; width: auto; padding: 0 16px; }
-.otc-link { align-self: center; padding: 2px 4px; border: 0; background: none; font: 700 16px/1.4 system-ui, -apple-system, sans-serif; color: var(--teal); cursor: pointer; }
+.otc-link { align-self: center; padding: 2px 4px; border: 0; background: none; font: 700 16px/1.4 "OTC Nunito", system-ui, sans-serif; color: var(--gold); cursor: pointer; }
 .otc-link:hover { text-decoration: underline; }
 .otc-link:disabled { color: var(--muted); text-decoration: none; cursor: default; }
 .otc-gsi { display: flex; justify-content: center; min-height: 44px; }
@@ -50,28 +51,28 @@
 /* Typing a phone number and a code */
 .otc-field { display: flex; gap: 10px; }
 .otc-field select, .otc-field input, .otc-digits input { height: 58px; border: 1.5px solid rgba(255, 255, 255, 0.16); border-radius: 14px;
-  background: rgba(255, 255, 255, 0.06); color: #FFFFFF; font: 700 20px/1 system-ui, -apple-system, sans-serif; outline: none; }
+  background: rgba(0, 0, 0, 0.2); color: #FFFFFF; font: 700 20px/1 "OTC Nunito", system-ui, sans-serif; outline: none; }
 .otc-field select { width: 128px; flex: none; padding: 0 10px; }
-.otc-field select option { background: #161A31; }
+.otc-field select option { background: #3A2F5C; }
 .otc-field input { flex: 1; min-width: 0; padding: 0 16px; }
 .otc-field input::placeholder { color: rgba(255, 255, 255, 0.35); }
-.otc-field select:focus, .otc-field input:focus, .otc-digits input:focus { border-color: var(--teal); box-shadow: 0 0 0 4px rgba(34, 184, 171, 0.2); }
+.otc-field select:focus, .otc-field input:focus, .otc-digits input:focus { border-color: var(--gold); box-shadow: 0 0 0 4px rgba(255, 201, 60, 0.2); }
 .otc-digits { display: flex; justify-content: center; gap: 10px; margin: 4px 0; }
 .otc-digits input { width: 58px; height: 70px; padding: 0; text-align: center; font-size: 30px; }
 .otc-robot { display: flex; justify-content: center; min-height: 65px; }
 
 /* "All yours", "Your account" */
-.otc-check { width: 76px; height: 76px; display: grid; place-items: center; border-radius: 50%; background: var(--teal); color: #03211E; box-shadow: 0 14px 36px -12px rgba(34, 184, 171, 0.9); }
+.otc-check { width: 76px; height: 76px; display: grid; place-items: center; border-radius: 50%; background: var(--gold); color: var(--ink); box-shadow: 0 5px 0 rgba(0, 0, 0, 0.3); }
 .otc-row { display: flex; align-items: center; gap: 16px; }
 .otc-dot { width: 50px; height: 50px; flex: none; display: grid; place-items: center; border-radius: 50%; }
-.otc-dot.otc-teal { background: var(--teal); color: #03211E; }
-.otc-dot.otc-tan { background: var(--tangerine); color: #2B1300; }
-.otc-dot.otc-grey { background: rgba(255, 255, 255, 0.12); color: #FFFFFF; }
+.otc-dot.otc-teal { background: var(--gold); color: var(--ink); }
+.otc-dot.otc-tan { background: #FF8C42; color: #2B1300; }
+.otc-dot.otc-grey { background: #4A3E70; color: #FFFFFF; }
 .otc-row b { display: block; font-size: 18px; line-height: 1.3; }
 .otc-row div span { display: block; font-size: 16px; color: var(--muted); }
 .otc-bits { position: absolute; inset: 0; pointer-events: none; }
 .otc-bits i { position: absolute; display: block; }
-.otc-spin { width: 46px; height: 46px; border-radius: 50%; border: 4px solid rgba(255, 255, 255, 0.14); border-top-color: var(--teal); animation: otc-spin 0.9s linear infinite; }
+.otc-spin { width: 46px; height: 46px; border-radius: 50%; border: 4px solid rgba(255, 255, 255, 0.14); border-top-color: var(--gold); animation: otc-spin 0.9s linear infinite; }
 @keyframes otc-spin { to { transform: rotate(360deg); } }
 
 /* Another company's window, pretend (on this Mac only): its own light look, not ours */
@@ -95,13 +96,12 @@
 
 @media (max-width: 560px) {
   .otc-win { padding: 32px 24px 26px; }
-  .otc-win h2 { font-size: 38px; }
+  .otc-win h2 { font-size: 44px; }
   .otc-two { flex-direction: column; }
 }
 @media (prefers-reduced-motion: reduce) { .otc-spin { animation-duration: 3s; } }
 
 /* The giveaway on phones, in the game's paper look (see phoneWelcome in shop.js) */
-@font-face { font-family: "OTC Brush"; src: url("../fonts/CaveatBrush-Regular.ttf") format("truetype"); font-display: swap; }
 .otc-phone { position: fixed; inset: 0; z-index: 1001; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 24px;
   padding: 72px 22px 34px; box-sizing: border-box; background: linear-gradient(rgba(43, 29, 74, 0.12), rgba(43, 29, 74, 0.34)), url("../video/play/fruit-slicer.jpg") 30% 50% / cover #2B1D4A;
   font: 400 17px/1.4 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; color: #2B1D4A; -webkit-font-smoothing: antialiased; }
