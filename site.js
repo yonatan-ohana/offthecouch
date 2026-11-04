@@ -1,13 +1,5 @@
-// The home page: the game's menu on the first screen, its videos. Every page that loads this: the sale end and the count of visits. Nothing moves for people who
+// The home page: the game's menu on the first screen, its videos. Every page that loads this: the count of visits. Nothing moves for people who
 // asked their computer for less motion.
-// The launch price ends by itself at the end of 15 November in California (as the online program's LAUNCH_ENDS):
-// after that the usual price shows again.
-const SALE = Date.now() < Date.parse('2026-11-16T08:00:00Z');
-if (!SALE) {
-  document.querySelectorAll('[data-launch]').forEach(e => e.remove());
-  document.querySelectorAll('[data-usual]').forEach(e => { e.textContent = e.dataset.usual; });
-}
-
 // The giveaway's lines show only while free copies are left.
 fetch('https://api.cuzgames.com/api/giveaway').then(r => r.json()).then(g => {
   if (g.left > 0) document.querySelectorAll('[data-giveaway]').forEach(e => { e.hidden = false; });
@@ -64,7 +56,7 @@ if (document.getElementById('deck')) {
     room.classList.toggle('away', current > 0);
     go.innerHTML = cards[current].dataset.free
       ? '<a class="gold big green" href="play/">Play free</a>'
-      : `<a class="gold" href="play/?unlock">Unlock all games · ${SALE ? '$3.99' : '$7.99'}</a><a class="pill" href="play/?signin"><small>Bought it?</small>Log in</a>`;
+      : `<a class="gold" href="play/?unlock">Unlock all games · $14.99</a><a class="pill" href="play/?signin"><small>Bought it?</small>Log in</a>`;
     playMiddle();
   }
 
