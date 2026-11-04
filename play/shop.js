@@ -166,15 +166,15 @@ var OTCShop = (function () {
     if (API && gift && !ON_ITCH) return alone(function () { freeCode(gift[1]); });
     var unlock = /[?&]unlock\b/.test(location.search);
     if (unlock) history.replaceState(null, "", location.pathname);
-    if (API && !kept("token") && /[?&]signin\b/.test(location.search)) { // "Sign in" on the website
-      history.replaceState(null, "", location.pathname);
-      return alone(account);
-    }
+    var signin = /[?&]signin\b/.test(location.search);
+    if (signin) history.replaceState(null, "", location.pathname);
+    if (API && !kept("token") && signin) return alone(account); // "Sign in" on the website
     if (API && !kept("token") && unlock) return alone(buy); // "Unlock in your browser" on the website
     if (!API || !kept("token")) return play(null);
     call("/api/me").then(function (r) {
       me = r.account;
-      if (!me.bought) return unlock ? alone(buy) : play(null);
+      if (!me.bought) return unlock ? alone(buy) : signin ? alone(account) : play(null);
+      if (unlock || signin) return alone(function () { show(ownedWindow()); });
       if (asked && asked[1] === "stopped") show(stoppedWindow());
       else takeTurn(!!asked);
     }, function (e) {
@@ -985,6 +985,17 @@ var OTCShop = (function () {
   }
 
   // 7a · Another computer is playing. fromGame: asked from the free game's unlock (a buyer who chose "Not now").
+  // "Unlock" or "Log in" on the website from someone who already has the games: say so, rather than just opening the
+  // game (owner, 2026-11-04: "It doesn't show up the payment").
+  function ownedWindow() {
+    return win([
+      h("span", { class: "otc-check" }, [icon(CHECK.replace(/26/g, "40").replace('stroke-width="2.6"', 'stroke-width="3"'))]),
+      title("You already have ", "all the games"),
+      para("You're signed in on this device, so there's nothing to pay."),
+      button("Let's play", "main", function () { location.replace(location.pathname); }), // asks first if another computer is playing
+    ], { center: true, closable: false });
+  }
+
   function elsewhereWindow(fromGame) {
     return win([
       kicker("One at a time"),

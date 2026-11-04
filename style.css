@@ -60,7 +60,8 @@ img, video { display: block; max-width: 100%; }
 .gift b { color: var(--gold); white-space: nowrap; }
 
 /* The cards. --x and --y are the card's middle on the stage (see show in site.js) */
-.deck { position: absolute; inset: 0; }
+.deck { position: absolute; inset: 0; pointer-events: none; } /* it covers the whole stage: only its cards and arrows may take clicks */
+.deck .card, .deck .arrow { pointer-events: auto; }
 .card { position: absolute; left: 0; top: 0; width: calc(var(--u) * 460); height: calc(var(--u) * 410); border-radius: calc(var(--u) * 36); background: var(--velvet); color: var(--lilac); box-shadow: 0 calc(var(--u) * 7) 0 var(--shadow); transform: translate(calc(var(--u) * var(--x, 640) - 50%), calc(var(--u) * var(--y, 310) - 50%)) scale(var(--s, 1)) rotate(var(--r, 0deg)); transition: transform 0.55s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.4s; cursor: pointer; }
 .card.open { background: #FFFFFF; color: var(--ink); }
 .card.open.now { outline: calc(var(--u) * 6) solid var(--gold); }
