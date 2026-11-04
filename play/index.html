@@ -91,6 +91,25 @@
         background: rgba(43, 29, 74, .82); color: #FFFFFF; text-align: center; }
       #orchard .line svg { width: 18px; height: 18px; flex: none; }
       #orchard .line.problem { border-radius: 22px; background: #2B1D4A; }
+      #orchard #promise { display: none; }
+      #orchard #promise.problem { display: inline-flex; }
+      /* The promise under the button (owner's pick 2026-11-04, drafts/camera-promise.html, option 1): the game's taped paper. */
+      #orchard .note { position: relative; max-width: 640px; padding: 14px 26px; border-radius: 6px; background: #FFFBF3; color: #2B1D4A;
+        box-shadow: 6px 8px 0 rgba(43, 29, 74, .28); transform: rotate(-1.2deg); }
+      #orchard .note::before { content: ""; position: absolute; left: 50%; top: -13px; width: 96px; height: 26px; margin-left: -48px;
+        background: rgba(255, 201, 60, .8); transform: rotate(2deg); }
+      #orchard .note b { display: block; margin-bottom: 6px; text-align: center; font: 400 34px/1.1 "Caveat Brush", -apple-system, system-ui, sans-serif; }
+      #orchard .note ul { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px 18px; margin: 0; padding: 0; list-style: none; font-size: 19px; }
+      #orchard .note li::before { content: "\2713\00a0"; color: #2E9E5B; font-weight: 900; }
+      #orchard .note[hidden] { display: none; }
+      @media (max-height: 500px) {
+        #orchard .middle { top: 61%; gap: 12px; }
+        #play { font-size: 25px; padding: 14px 32px; box-shadow: 0 6px 0 #C9921A; }
+        #orchard .note { padding: 8px 16px; }
+        #orchard .note::before { top: -9px; width: 70px; height: 18px; margin-left: -35px; }
+        #orchard .note b { margin: 0; font-size: 24px; }
+        #orchard .note ul { gap: 2px 12px; font-size: 14px; }
+      }
       #growing { position: absolute; left: 50%; bottom: 7vh; width: min(360px, 60vw); height: 12px; transform: translateX(-50%);
         border-radius: 6px; background: rgba(43, 29, 74, .55); overflow: hidden; }
       #growing div { height: 100%; width: 0; background: #FFC93C; border-radius: 6px; transition: width .2s; }
@@ -113,6 +132,7 @@
       <h1>Fruit Slicer</h1>
       <div class="middle">
         <button id="play"><svg viewBox="0 0 24 24" fill="none" stroke="#2B1D4A" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.6"/></svg><span>Play with your camera</span></button>
+        <div class="note" id="note"><b>Your camera stays yours</b><ul><li>Stays on your device</li><li>Nothing recorded</li><li>Never sent to us</li></ul></div>
         <div class="line" id="promise"><svg viewBox="0 0 24 24" fill="#FFC93C" aria-hidden="true"><path d="M7 10V7a5 5 0 0 1 10 0v3h1.5v11h-13V10zm2.4 0h5.2V7a2.6 2.6 0 0 0-5.2 0z"/></svg><span>Your picture stays on your device. Nothing is recorded.</span></div>
       </div>
       <div id="growing"><div></div></div>
@@ -444,6 +464,7 @@
           tapped = false;
           button.disabled = false;
           label.textContent = "Try again";
+          document.getElementById("note").hidden = true;
           promise.classList.add("problem");
           promise.querySelector("span").textContent = words;
           tell("camera: " + words.split(".")[0].toLowerCase());
