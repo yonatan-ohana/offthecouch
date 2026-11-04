@@ -178,7 +178,7 @@ img, video { display: block; max-width: 100%; }
 .top { position: fixed; inset: 0 0 auto; z-index: 20; background: var(--night); box-shadow: 0 4px 0 var(--shadow); }
 .top .wrap { display: flex; align-items: center; gap: 24px; height: 76px; }
 .brand { --u: 0.68px; flex: none; }
-.top nav { display: flex; gap: 24px; margin-left: auto; font-family: "Caveat Brush", sans-serif; font-size: 22px; color: var(--lilac); }
+.top nav { display: flex; gap: 24px; margin-left: auto; font-family: "Caveat Brush", sans-serif; font-size: 22px; color: var(--lilac); white-space: nowrap; }
 .top nav a:hover, .top .signin:hover { color: var(--gold); }
 .top .signin { font-family: "Caveat Brush", sans-serif; font-size: 22px; white-space: nowrap; }
 .btn { display: inline-flex; align-items: center; justify-content: center; height: 44px; padding: 0 22px; border-radius: 999px; background: var(--green); color: #FFFFFF; font-family: "Caveat Brush", sans-serif; font-size: 24px; white-space: nowrap; box-shadow: 0 4px 0 rgba(0, 0, 0, 0.35); transition: transform 0.15s; }
@@ -269,7 +269,7 @@ img, video { display: block; max-width: 100%; }
 @media (max-aspect-ratio: 11 / 10) and (max-height: 800px) { .say p, .say .gift { display: none; } }
 /* Phones lying down and other very short windows: the menu keeps its shape and the page scrolls */
 @media (min-aspect-ratio: 11 / 10) and (max-height: 600px) { :root { --u: calc(100vw / 1280); } }
-@media (max-width: 760px) {
+@media (max-width: 860px) {
   .top nav { display: none; }
   .top .signin { margin-left: auto; }
   .brand { --u: 0.56px; }
@@ -280,7 +280,8 @@ img, video { display: block; max-width: 100%; }
   .tiles { grid-template-columns: repeat(2, 1fr); gap: 12px; }
   .moves { grid-template-columns: 1fr 1fr; }
 }
-@media (max-width: 400px) { .top .wrap { gap: 12px; } .top .signin { display: none; } .top .btn { margin-left: auto; } }
+@media (max-width: 520px) { .top .wrap { gap: 12px; } .top .signin { display: none; } .top .btn { margin-left: auto; } }
+@media (max-width: 345px) { .brand { --u: 0.46px; } }
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   .note, .sale, .dot, .gold.green, .freego, .card.waiting { animation: none; }
