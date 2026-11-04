@@ -161,9 +161,12 @@ var OTCShop = (function () {
     var free = /[?&]free\b/.test(location.search); // the giveaway's link (see giveaway)
     if (free) history.replaceState(null, "", location.pathname);
     if (API && free && !ON_ITCH) return alone(giveaway);
-    var gift = /[?&]code=([A-Za-z0-9-]{8,20})/.exec(location.search); // a free code's link (Discord's button, see /api/discord)
+    var gift = /[?&]code=([A-Za-z0-9-]{8,40})/.exec(location.search); // a free code's link (Discord's button, see /api/discord)
     if (gift) history.replaceState(null, "", location.pathname);
     if (API && gift && !ON_ITCH) return alone(function () { freeCode(gift[1]); });
+    var hasCode = /[?&]havecode\b/.test(location.search); // the page buyers see in the second shop, where sellers earn a cut
+    if (hasCode) history.replaceState(null, "", location.pathname);
+    if (API && hasCode && !ON_ITCH) return alone(function () { freeCode(); });
     var unlock = /[?&]unlock\b/.test(location.search);
     if (unlock) history.replaceState(null, "", location.pathname);
     var signin = /[?&]signin\b/.test(location.search);
@@ -690,7 +693,7 @@ var OTCShop = (function () {
       button("Use my phone number", "glass", function () { show(phoneWindow("buy")); }, PHONE),
       fine("Next, you pay in the payment company's window."),
       link("Already bought? Sign in", function () { show(welcomeWindow()); }),
-      link("Got a free code?", function () { show(giftWindow()); }),
+      link("Got a code?", function () { show(giftWindow()); }),
     ]);
   }
 
@@ -698,7 +701,7 @@ var OTCShop = (function () {
   // in with Google keeps the games on every device. Someone already signed in uses it straight away. given: a code
   // that came in the link, filled in and checked at once.
   function giftWindow(given) {
-    var code = h("input", { type: "text", autocomplete: "off", autocapitalize: "characters", spellcheck: "false", placeholder: "OTC-XXXX-XXXX", "aria-label": "Your code" });
+    var code = h("input", { type: "text", autocomplete: "off", autocapitalize: "characters", spellcheck: "false", placeholder: "Paste your code", "aria-label": "Your code" });
     var error = h("p", { class: "otc-error", role: "alert" });
     var go = function () {
       error.textContent = "";
@@ -709,9 +712,9 @@ var OTCShop = (function () {
       }, function (e) { error.textContent = problem(e); });
     };
     var box = win([
-      kicker("Free code"),
+      kicker("Your code"),
       title("Got a ", "code?"),
-      para("Type the code you were given. It opens every game."),
+      para("Paste your code. It opens every game."),
       h("div", { class: "otc-field" }, [code]),
       error,
       button("Use my code", "main", go),
@@ -739,7 +742,7 @@ var OTCShop = (function () {
 
   function giftSignInWindow(code) {
     return win([
-      kicker("Free code"),
+      kicker("Your code"),
       title("The code ", "works!"),
       para("Sign in to keep the games on all your devices."),
       googleButton(function (account) {
