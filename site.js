@@ -134,7 +134,8 @@ function isTest() {
     const all = (location.search + ' ' + ref + ' ' + navigator.userAgent).toLowerCase();
     const paid = /[?&]from=(paid-[a-z0-9]+)/.exec(location.search); // a paid video's own link, so each one is counted apart
     const from = test ? 'test' : paid ? paid[1] : /tiktok|musical_ly|bytedance|ttclid/.test(all) ? 'tiktok' : /instagram/.test(all) ? 'instagram' :
-      /facebook|fban|fbav|fbclid/.test(all) ? 'facebook' : /youtube/.test(all) ? 'youtube' : /google|gclid/.test(all) ? 'google' :
+      /facebook|fban|fbav|fbclid/.test(all) ? 'facebook' : /youtube/.test(all) ? 'youtube' :
+      /gclid|gbraid|wbraid|gad_source/.test(all) ? 'google-ad' : /google/.test(all) ? 'google' :
       /itch\.io/.test(all) ? 'itch' : /discord/.test(all) ? 'discord' : /bing|duckduckgo|yahoo|ecosia/.test(all) ? 'search' : ref ? 'site' : 'direct';
     const visit = Math.random().toString(36).slice(2, 12);
     const device = /iPhone|iPad|Android|Mobi/.test(navigator.userAgent) || (/Macintosh/.test(navigator.userAgent) && navigator.maxTouchPoints > 1) ? 'phone' : 'computer';
@@ -154,7 +155,9 @@ function isTest() {
       clearTimeout(timer);
       start = Date.now();
       sessionStorage.setItem('otcStart', String(start));
-      send('site', '', '', true);
+      send('site', '', ref, true);
+      sessionStorage.setItem('otcLooked', '1');
+      send('looked', '', '', true);
       // Which app's own browser this is: a paid link's mark replaces it in "from", and the camera can behave differently there.
       const agent = navigator.userAgent, app = /musical_ly|bytedance|tiktok|trill/i.test(agent) ? 'TikTok' : /instagram/i.test(agent) ? 'Instagram' :
         /fban|fbav|fb_iab/i.test(agent) ? 'Facebook' : /snapchat/i.test(agent) ? 'Snapchat' : /; wv\)/.test(agent) ? 'an app' : '';

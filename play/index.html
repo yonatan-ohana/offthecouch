@@ -52,6 +52,7 @@
       @keyframes sideways { 0%, 25% { transform: rotate(0); } 55%, 90% { transform: rotate(-90deg); } 100% { transform: rotate(0); } }
       @keyframes tick { 0%, 52% { opacity: 0; } 60%, 86% { opacity: 1; } 94%, 100% { opacity: 0; } }
       @media (orientation: portrait) { body.phone #turn { display: flex; } }
+      #turn small { padding: 0 24px; color: #CFC6E8; text-align: center; font: 600 18px/1.35 -apple-system, "Segoe UI", system-ui, sans-serif; }
       #turn p { margin: 0; padding: 0 24px; color: #FFC93C; text-align: center; font: 400 clamp(32px, 9vw, 52px)/1.15 "Caveat Brush", -apple-system, system-ui, sans-serif; }
       #numbers { display: none; position: fixed; left: 8px; top: 8px; z-index: 10; padding: 4px 8px; border-radius: 4px;
         background: rgba(43, 45, 66, .7); color: #FFFFFF; font: 600 11px/1.35 ui-monospace, Menlo, monospace;
@@ -92,8 +93,16 @@
         background: rgba(43, 29, 74, .82); color: #FFFFFF; text-align: center; }
       #orchard .line svg { width: 18px; height: 18px; flex: none; }
       #orchard .line.problem { border-radius: 22px; background: #2B1D4A; }
+      /* What this is (owner's pick 2026-11-05, drafts/play-words.html, option 1): someone from a search sees what the game is
+         and that it is free before anything asks for the camera. */
+      #orchard .say, #orchard .back { margin: 0; border-radius: 999px; background: rgba(43, 29, 74, .86); color: #FFFFFF; text-align: center; }
+      #orchard .say { max-width: calc(100vw - 32px); padding: 8px 24px; font: 800 clamp(17px, 2.3vw, 28px)/1.2 -apple-system, "Segoe UI", system-ui, sans-serif; }
+      #orchard .back { padding: 5px 18px; font: 700 clamp(14px, 1.6vw, 20px)/1.2 -apple-system, "Segoe UI", system-ui, sans-serif; }
       #orchard #promise { display: none; }
       #orchard #promise.problem { display: inline-flex; }
+      #also { font: 800 19px/1.1 -apple-system, "Segoe UI", system-ui, sans-serif; color: #2B1D4A; background: #FFC93C; border: 0; border-radius: 999px;
+        padding: 12px 26px; cursor: pointer; box-shadow: 0 5px 0 #C9921A; }
+      #also[hidden] { display: none; }
       /* The promise under the button (owner's pick 2026-11-04, drafts/camera-promise.html, option 1): the game's taped paper. */
       #orchard .note { position: relative; max-width: 640px; padding: 14px 26px; border-radius: 6px; background: #FFFBF3; color: #2B1D4A;
         box-shadow: 6px 8px 0 rgba(43, 29, 74, .28); transform: rotate(-1.2deg); }
@@ -104,12 +113,16 @@
       #orchard .note li::before { content: "\2713\00a0"; color: #2E9E5B; font-weight: 900; }
       #orchard .note[hidden] { display: none; }
       @media (max-height: 500px) {
-        #orchard .middle { top: 61%; gap: 12px; }
+        #orchard .middle { top: 59%; gap: 7px; }
         #play { font-size: 25px; padding: 14px 32px; box-shadow: 0 6px 0 #C9921A; }
+        #orchard #growing { bottom: 3vh; }
         #orchard .note { padding: 8px 16px; }
         #orchard .note::before { top: -9px; width: 70px; height: 18px; margin-left: -35px; }
         #orchard .note b { margin: 0; font-size: 24px; }
         #orchard .note ul { gap: 2px 12px; font-size: 14px; }
+      }
+      @media (max-height: 420px) {
+        #orchard h1 { top: 2vh; font-size: 60px; -webkit-text-stroke-width: 3px; }
       }
       #growing { position: absolute; left: 50%; bottom: 7vh; width: min(360px, 60vw); height: 12px; transform: translateX(-50%);
         border-radius: 6px; background: rgba(43, 29, 74, .55); overflow: hidden; }
@@ -132,9 +145,12 @@
     <div id="orchard">
       <h1>Fruit Slicer</h1>
       <div class="middle">
+        <p class="say">Free from Off the Couch. Slice falling fruit with your hands.</p>
         <button id="play"><svg viewBox="0 0 24 24" fill="none" stroke="#2B1D4A" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.6"/></svg><span>Play with your camera</span></button>
+        <p class="back" id="back">Stand 2 big steps back</p>
         <div class="note" id="note"><b>Your camera stays yours</b><ul><li>Stays on your device</li><li>Nothing recorded</li><li>Never sent to us</li></ul></div>
         <div class="line" id="promise"><svg viewBox="0 0 24 24" fill="#FFC93C" aria-hidden="true"><path d="M7 10V7a5 5 0 0 1 10 0v3h1.5v11h-13V10zm2.4 0h5.2V7a2.6 2.6 0 0 0-5.2 0z"/></svg><span>Your picture stays on your device. Nothing is recorded.</span></div>
+        <button id="also" hidden>Copy the link</button>
       </div>
       <div id="growing"><div></div></div>
     </div>
@@ -146,6 +162,7 @@
           <path class="tick" d="M75 90 l10 10 l20 -22" fill="none" stroke="#FFC93C" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" transform="rotate(90 90 90)"/></g>
       </svg>
       <p id="turn-words">Turn your phone sideways to play</p>
+      <small id="turn-what">Fruit Slicer: a free game. Slice falling fruit with your hands.</small>
     </div>
     <div id="numbers"></div>
     <button id="full" aria-label="Full screen"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2B1D4A" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5"/></svg></button>
@@ -158,9 +175,9 @@
       var Files = "https://api.cuzgames.com/api/free/build/";
       var config = {
         arguments: [],
-        dataUrl: Files + "d813c73d4902ca2c0cf464aee55aaa3a.data.unityweb",
-        frameworkUrl: Files + "92217fa2eb75fd9bc8b7bdc5c3a845a6.framework.js.unityweb",
-        codeUrl: Files + "85253e5dc5a8e03b492c2668266962e6.wasm.unityweb",
+        dataUrl: Files + "2fc9d5a4c541489166054b9b7c78821d.data.unityweb",
+        frameworkUrl: Files + "b24b738fbd1df6d090afc30c63b76682.framework.js.unityweb",
+        codeUrl: Files + "b42a6eeda7d058e398adffedece1ff15.wasm.unityweb",
         streamingAssetsUrl: "StreamingAssets",
         companyName: "Yonatan Ohana",
         productName: "Off the Couch",
@@ -389,7 +406,7 @@
         flying(page);
 
         button.onclick = function () {
-          if (copying) return copyLink();
+          if (copying) return copyLink(label, "Copied: paste it in Chrome or Safari");
           if (tapped) return;
           tapped = true;
           button.disabled = true;
@@ -419,7 +436,7 @@
         function whyRefused(error, waited) {
           if (app) return insideAnApp();
           if (!error || error.name !== "NotAllowedError")
-            return refused("No camera was found, or another app is using it. Close that app, then tap the button again.");
+            return noCamera();
           var agent = navigator.userAgent;
           if (/iPhone|iPad/.test(agent) || (/Macintosh/.test(agent) && navigator.maxTouchPoints > 1))
             return refused("The camera is blocked. Reload this page, then choose Allow.");
@@ -436,6 +453,15 @@
           navigator.permissions.query({ name: "camera" }).then(function (p) { answer(p.state); }, function () { answer(""); });
         }
 
+        // No camera here, or another app has it (2026-11-05: one visitor tapped 12 times and got this each time): the way
+        // on is another device, so the link is one tap away.
+        function noCamera() {
+          refused("No camera found here. If another app is using it, close it and tap Try again. Or open offthecouch.cuzgames.com/play on a phone or tablet.");
+          var also = document.getElementById("also");
+          also.hidden = false;
+          also.onclick = function () { copyLink(also, "Copied: open it on a phone or tablet"); };
+        }
+
         // An app's own browser may keep the camera for itself, and there is no address bar to fix it from. The button
         // now copies the link, with a paid video's mark, so that visit still counts for it.
         function insideAnApp() {
@@ -443,11 +469,11 @@
           copying = true;
           label.textContent = "Copy the link";
         }
-        function copyLink() {
+        function copyLink(words, done) {
           var from = "", link = location.origin + location.pathname;
           try { from = sessionStorage.getItem("otcFrom") || ""; } catch (e) {}
           if (/^paid-[a-z0-9]+$/.test(from)) link += "?from=" + from;
-          var worked = function () { label.textContent = "Copied: paste it in Chrome or Safari"; };
+          var worked = function () { words.textContent = done; };
           var failed = function () { promise.querySelector("span").textContent = "Open this address in Chrome or Safari: " + link; };
           var oldWay = function () { // apps' own browsers often refuse the new way
             var box = document.createElement("textarea"), done = false;
@@ -550,7 +576,7 @@
           config.codeUrl = full.code;
         }
         var loader = document.createElement("script");
-        loader.src = full ? full.loader : Files + "327f526aba359949c3ff5273927fa7a2.loader.js";
+        loader.src = full ? full.loader : Files + "aebb63066ec36ee96e5c96f90e5095e7.loader.js";
         loader.onerror = function () {
           if (!full && Files !== "Build/") { // the website's own copy instead
             ["dataUrl", "frameworkUrl", "workerUrl", "codeUrl", "symbolsUrl"].forEach(function (part) {

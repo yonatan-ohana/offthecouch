@@ -143,8 +143,9 @@ var OTCShop = (function () {
   function start(go) {
     var firstPage = true;
     try { firstPage = !sessionStorage.getItem("otcFrom"); } catch (e) {}
-    if (firstPage) step("site");
+    if (firstPage) step("site", "", linkedFrom());
     step("page");
+    watchLooked();
     addEventListener("pagehide", stayed);
     document.addEventListener("visibilitychange", function () { if (document.visibilityState === "hidden") stayed(); });
     watchReader();
@@ -236,7 +237,7 @@ var OTCShop = (function () {
   // account, no computer name, no camera picture.
 
   var counted = {}, openedAt = Date.now(), told = 0, tester = isTest();
-  var ONCE = ["site", "page", "phone", "camera_on", "camera_refused", "camera_none", "person", "left"];
+  var ONCE = ["site", "looked", "page", "phone", "camera_on", "camera_refused", "camera_none", "person", "offer", "left"];
   function step(name, game, detail) {
     afterRound(name, detail);
     var key = name + "|" + (game || ""), first = !counted[key];
@@ -298,10 +299,39 @@ var OTCShop = (function () {
     var paid = /[?&]from=(paid-[a-z0-9]+)/.exec(location.search); // a paid video's own link, so each one is counted apart
     var all = (location.search + " " + ref + " " + navigator.userAgent).toLowerCase(), from = paid ? paid[1] :
       /tiktok|musical_ly|bytedance|ttclid/.test(all) ? "tiktok" : /instagram/.test(all) ? "instagram" :
-      /facebook|fban|fbav|fbclid/.test(all) ? "facebook" : /youtube/.test(all) ? "youtube" : /google|gclid/.test(all) ? "google" :
+      /facebook|fban|fbav|fbclid/.test(all) ? "facebook" : /youtube/.test(all) ? "youtube" :
+      /gclid|gbraid|wbraid|gad_source/.test(all) ? "google-ad" : /google/.test(all) ? "google" :
       /itch\.io/.test(all) ? "itch" : /discord/.test(all) ? "discord" : /bing|duckduckgo|yahoo|ecosia/.test(all) ? "search" : ref ? "site" : "direct";
     try { sessionStorage.setItem("otcFrom", from); } catch (e) {}
     return from;
+  }
+
+  // The website that linked here, for the owner's list of websites that send people.
+  function linkedFrom() {
+    try {
+      var ref = document.referrer ? new URL(document.referrer).hostname : "";
+      return /(^|\.)(cuzgames|yo-software)\.com$/.test(ref) ? "" : ref;
+    } catch (e) { return ""; }
+  }
+
+  // Someone is really there: the page stayed in front of them for 3 seconds, or they touched it (an app opening the
+  // page behind a video is neither). Once a visit: the website's first page may have said so already (see site.js).
+  function watchLooked() {
+    var timer = 0, seen = function () {
+      clearTimeout(timer);
+      try {
+        if (sessionStorage.getItem("otcLooked")) return;
+        sessionStorage.setItem("otcLooked", "1");
+      } catch (e) {}
+      step("looked");
+    };
+    var wait = function () {
+      clearTimeout(timer);
+      if (document.visibilityState === "visible" && !document.prerendering) timer = setTimeout(seen, 3000);
+    };
+    ["pointerdown", "keydown"].forEach(function (type) { addEventListener(type, seen, { once: true, passive: true, capture: true }); });
+    document.addEventListener("visibilitychange", wait);
+    wait();
   }
 
   // How long the visit lasted, counted once as it ends: the tab closed, or put away (a phone going back to the app).
@@ -1213,5 +1243,8 @@ var OTCShop = (function () {
   // During the launch price: the usual price and the day it ends, as "$7.99|15 November" (empty otherwise).
   function sale() { return WAS ? WAS + "|" + ENDS : ""; }
 
-  return { start: start, buy: buy, account: account, takeAnswer: takeAnswer, step: step, say: say, price: price, sale: sale };
+  // Whether this page offers a free copy after a round itself (the giveaway on phones); then the game shows no price.
+  function giftOffer() { return !!giftCount && !giftTaken; }
+
+  return { start: start, buy: buy, account: account, takeAnswer: takeAnswer, step: step, say: say, price: price, sale: sale, giftOffer: giftOffer };
 })();
