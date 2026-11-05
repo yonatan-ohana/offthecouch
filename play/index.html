@@ -213,9 +213,9 @@
       var Files = "https://api.cuzgames.com/api/free/build/";
       var config = {
         arguments: [],
-        dataUrl: Files + "2fc9d5a4c541489166054b9b7c78821d.data.unityweb",
-        frameworkUrl: Files + "b24b738fbd1df6d090afc30c63b76682.framework.js.unityweb",
-        codeUrl: Files + "b42a6eeda7d058e398adffedece1ff15.wasm.unityweb",
+        dataUrl: Files + "c39aba79a4cd86df65e419b3c1edf1a1.data.unityweb",
+        frameworkUrl: Files + "db2ee0bb061e8bf719956742b1cc551a.framework.js.unityweb",
+        codeUrl: Files + "87b1d968256ea919cf8babad3e6fcf06.wasm.unityweb",
         streamingAssetsUrl: "StreamingAssets",
         companyName: "Yonatan Ohana",
         productName: "Off the Couch",
@@ -540,10 +540,10 @@
 
         // The wait after Play: the fruit stops, so nobody tries to slice it, and the card teaches the game beside the real
         // download. Into the game once the body reader can see them too, so "Starting the camera..." is never on screen
-        // with the camera already on. The game is about 60 MB and the reader about 21 on the way here (17 on phones, with
+        // with the camera already on. The game is about 53 MB and the reader about 21 on the way here (17 on phones, with
         // the lighter body model; early.js counts the reader's files once unpacked).
         function showWait() {
-          var game = 60, reader = phone ? 17 : 21, unpacked = (phone ? 27.2 : 30.6) * 1048576, past = [], speed = document.getElementById("speed");
+          var game = 53, reader = phone ? 17 : 21, unpacked = (phone ? 27.2 : 30.6) * 1048576, past = [], speed = document.getElementById("speed");
           var fill = document.querySelector("#wait .fill div"), label = function (done) {
             var total = game + reader, left = Math.round(total - done);
             fill.style.width = 95 * done / total + "%";
@@ -646,7 +646,7 @@
           config.codeUrl = full.code;
         }
         var loader = document.createElement("script");
-        loader.src = full ? full.loader : Files + "aebb63066ec36ee96e5c96f90e5095e7.loader.js";
+        loader.src = full ? full.loader : Files + "a1935a75901e1c785d723cd2479a1438.loader.js";
         loader.onerror = function () {
           if (!full && Files !== "Build/") { // the website's own copy instead
             ["dataUrl", "frameworkUrl", "workerUrl", "codeUrl", "symbolsUrl"].forEach(function (part) {

@@ -79,7 +79,7 @@
   // same as the loading card's, because Safari does not say how much really came. Someone who goes first leaves a line too;
   // tablets and phones often only put the page away, so that counts, and if they come back the finish line still follows.
   function watch() {
-    var opened = performance.now(), finished = false, gone = false, readerSize = phone ? 17 : 21, size = phone ? 77 : 81;
+    var opened = performance.now(), finished = false, gone = false, readerSize = phone ? 17 : 21, size = phone ? 70 : 74;
     var unpacked = (phone ? 27.2 : 30.6) * MB, waiting = reader.length, had = 0, grewAt = opened;
     var soon = function (words, tries) {
       if (window.OTCShop && OTCShop.say) return say(words);
