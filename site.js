@@ -1,3 +1,4 @@
+var priceNow = '$9.99'; // the visitor's own money once the online program answers, see below
 // The home page: the game's menu on the first screen, its videos. Every page that loads this: the count of visits. Nothing moves for people who
 // asked their computer for less motion.
 // The giveaway's lines show only while free copies are left.
@@ -56,7 +57,7 @@ if (document.getElementById('deck')) {
     room.classList.toggle('away', current > 0);
     go.innerHTML = cards[current].dataset.free
       ? '<a class="gold big green" href="play/">Play free</a>'
-      : `<a class="gold" href="play/?unlock">Unlock all games · $14.99</a><a class="pill" href="play/?signin"><small>Bought it?</small>Log in</a>`;
+      : `<a class="gold" href="play/?unlock">Unlock all games · <span data-price>${priceNow}</span></a><a class="pill" href="play/?signin"><small>Bought it?</small>Log in</a>`;
     playMiddle();
   }
 
@@ -105,6 +106,15 @@ if (document.getElementById('deck')) {
 // A visit counts only once someone is really there: the page on screen for 3 seconds, or a touch, scroll or click.
 // Apps such as TikTok load an ad's page early while the ad plays and drop it when the person swipes on; those, and
 // anyone gone within 3 seconds, count only as a "glance", with no story.
+// The price in the visitor's own money, from the online program (it knows the country); the pages are typed in dollars.
+if (document.querySelector('[data-price]') && !/^(localhost|127\.0\.0\.1)$/.test(location.hostname)) {
+  fetch('https://api.cuzgames.com/api/config').then((r) => r.json()).then((c) => {
+    if (!c.price || !c.price.now) return;
+    priceNow = c.price.now;
+    document.querySelectorAll('[data-price]').forEach((e) => { e.textContent = priceNow; });
+  }).catch(() => {});
+}
+
 // The owner's tests are counted apart, as coming from "test" (owner, 2026-10-31: "make sure my test sessions are not
 // counted... toggle it in the analytics"; the numbers page hides them unless its Tests switch is on): open any page once
 // with ?tester=on to mark this device (?tester=off unmarks it); it stays marked on this device and browser. Headless

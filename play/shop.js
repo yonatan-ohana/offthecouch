@@ -11,7 +11,7 @@ var OTCShop = (function () {
   var API = LOCAL ? "http://localhost:8821" : "https://api.cuzgames.com";
   // While payments are in practice mode (fake test cards pay), buying is open only on this Mac and the hidden test page.
   var PRACTICE_OK = LOCAL || /\/play-test-/.test(location.pathname);
-  var PRICE = "$14.99", CONTACT = "support@cuzgames.com", DISCORD = "https://discord.gg/fHxH9XVwNA"; // our Discord server (invite never expires)
+  var PRICE = "$9.99", CONTACT = "support@cuzgames.com", DISCORD = "https://discord.gg/fHxH9XVwNA"; // our Discord server (invite never expires)
   // On itch.io the game runs inside itch's own page, where signing in and paying can't open: buying and signing in
   // happen on our website, in a new tab, and the games open there.
   var ON_ITCH = /(^|\.)itch\.(zone|io)$/.test(location.hostname), SITE = "https://offthecouch.cuzgames.com";
@@ -880,7 +880,7 @@ var OTCShop = (function () {
       items: [{ priceId: settings.paddle.price, quantity: 1 }],
       customData: { ref: ref },
       customer: email ? { email: email } : undefined,
-      settings: { displayMode: "overlay", theme: "dark", locale: "en", allowLogout: false },
+      settings: { displayMode: "overlay", theme: "dark", allowLogout: false }, // in the buyer's own language
     });
   }
 
