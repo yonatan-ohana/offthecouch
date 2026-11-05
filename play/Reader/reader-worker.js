@@ -34,7 +34,9 @@ function load(base, instead) {
     var started = performance.now(), blank = new ImageData(64, 64);
     body.detectForVideo(blank, stamp());
     hands.detectForVideo(blank, stamp());
-    self.postMessage({ kind: "ready", processor: processor, warmMs: performance.now() - started });
+    // How much came over the internet in this lane (the page's speed record, see play/early.js).
+    var got = performance.getEntriesByType("resource").reduce(function (sum, entry) { return sum + (entry.transferSize || 0); }, 0);
+    self.postMessage({ kind: "ready", processor: processor, warmMs: performance.now() - started, got: got });
   }, function (error) {
     if (instead) {
       console.warn("[Browser] the reader's files did not come from storage, using the page's own:", error);

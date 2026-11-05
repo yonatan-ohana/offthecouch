@@ -204,3 +204,10 @@ function isTest() {
     document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden' && there) left(); });
   } catch (e) {}
 })();
+
+// Computers start downloading the game now, so most of it is here before Play is pressed (see play/early.js).
+addEventListener('load', () => setTimeout(() => {
+  const script = document.createElement('script');
+  script.src = '/play/early.js';
+  document.head.appendChild(script);
+}, 1500));
