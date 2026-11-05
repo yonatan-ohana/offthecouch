@@ -111,7 +111,9 @@
       });
       return worker;
     };
-    reader.forEach(function (name) { fetchFile(name).catch(function () {}); });
+    reader.forEach(function (name) {
+      fetchFile(name, function (size) { window.OTCReaderGot = (window.OTCReaderGot || 0) + size; }).catch(function () {});
+    });
   }
 
   if (onPlay) return watch();

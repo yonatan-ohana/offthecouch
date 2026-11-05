@@ -127,6 +127,33 @@
       #growing { position: absolute; left: 50%; bottom: 7vh; width: min(360px, 60vw); height: 12px; transform: translateX(-50%);
         border-radius: 6px; background: rgba(43, 29, 74, .55); overflow: hidden; }
       #growing div { height: 100%; width: 0; background: #FFC93C; border-radius: 6px; transition: width .2s; }
+      /* After Play: how to play and the real download, with no fruit flying (owner's pick, 2026-11-05: a tester tried to
+         slice the flying fruit, thinking it was the game). */
+      #orchard.waiting .say, #orchard.waiting #play, #orchard.waiting .back, #orchard.waiting #note, #orchard.waiting #promise,
+      #orchard.waiting #also, #orchard.waiting #growing, #orchard.waiting .fruit, #orchard.waiting .splat, #orchard.waiting svg.slash { display: none !important; }
+      #wait { display: none; position: relative; width: min(680px, calc(100vw - 32px)); padding: 22px 30px 20px; border-radius: 6px; background: #FFFBF3; color: #2B1D4A;
+        box-shadow: 0 6px 20px rgba(43, 29, 74, .28); font: 800 16px/1.2 -apple-system, "Segoe UI", system-ui, sans-serif; text-align: center; }
+      #orchard.waiting #wait { display: block; }
+      #wait::before { content: ""; position: absolute; left: 50%; top: -13px; width: 96px; height: 26px; margin-left: -48px; background: rgba(255, 201, 60, .8); transform: rotate(-2deg); }
+      #wait h2 { margin: 0 0 12px; font: 400 40px/1.1 "Caveat Brush", -apple-system, system-ui, sans-serif; }
+      #wait .how { display: flex; justify-content: center; gap: 12px; margin: 0 0 16px; padding: 0; list-style: none; font-size: clamp(14px, 2.2vmin, 18px); }
+      #wait .how li { flex: 1 1 0; min-width: 0; }
+      #wait .pic { position: relative; height: clamp(58px, 15vh, 104px); margin-bottom: 8px; }
+      #wait .pic img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; }
+      #wait .body { position: absolute; left: 50%; top: 4%; height: 92%; aspect-ratio: 1; transform: translateX(-50%); overflow: hidden; border-radius: 14px; background: #2B1D4A; }
+      #wait .body svg { position: absolute; left: 18%; bottom: -4%; width: 64%; height: auto; }
+      #wait .cut { position: absolute; left: 50%; top: 0; height: 100%; aspect-ratio: 5 / 3; transform: translateX(-50%); }
+      #wait .fill { height: 16px; border-radius: 8px; background: #D9D2E6; overflow: hidden; }
+      #wait .fill div { height: 100%; width: 0; border-radius: 8px; background: #FFC93C; transition: width .4s; }
+      #wait .speed { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 2px 18px; margin-top: 10px; font-size: clamp(15px, 2.4vmin, 19px); white-space: nowrap; }
+      #wait .speed b { font-size: 1.15em; }
+      #wait .speed.done { justify-content: center; }
+      @media (max-height: 500px) {
+        #wait { padding: 12px 18px 12px; }
+        #wait h2 { display: none; }
+        #wait::before { top: -9px; width: 70px; height: 16px; margin-left: -35px; }
+        #wait .how { margin-bottom: 8px; gap: 14px; }
+      }
     </style>
   </head>
   <body>
@@ -151,6 +178,16 @@
         <div class="note" id="note"><b>Your camera stays yours</b><ul><li>Stays on your device</li><li>Nothing recorded</li><li>Never sent to us</li></ul></div>
         <div class="line" id="promise"><svg viewBox="0 0 24 24" fill="#FFC93C" aria-hidden="true"><path d="M7 10V7a5 5 0 0 1 10 0v3h1.5v11h-13V10zm2.4 0h5.2V7a2.6 2.6 0 0 0-5.2 0z"/></svg><span>Your picture stays on your device. Nothing is recorded.</span></div>
         <button id="also" hidden>Copy the link</button>
+        <div id="wait">
+          <h2>How to play</h2>
+          <ul class="how">
+            <li><div class="pic"><span class="body"><svg viewBox="0 0 100 124" aria-hidden="true"><circle cx="50" cy="26" r="21" fill="#F1EEF8"/><path d="M12 124V84c0-22 16-32 38-32s38 10 38 32v40z" fill="#F1EEF8"/></svg></span></div>Stand 2 big steps back</li>
+            <li><div class="pic"><img src="orchard/watermelon.webp" alt=""><svg class="cut" viewBox="0 0 100 60" preserveAspectRatio="none" aria-hidden="true"><path d="M8 54 L92 6" stroke="#FFC93C" stroke-width="3.5" stroke-linecap="round" fill="none"/></svg></div>Swipe fast through the fruit</li>
+            <li><div class="pic"><img src="orchard/bomb.png" alt=""></div>Miss the bombs</li>
+          </ul>
+          <div class="fill"><div></div></div>
+          <p class="speed" id="speed"></p>
+        </div>
       </div>
       <div id="growing"><div></div></div>
     </div>
@@ -394,14 +431,14 @@
         try { seen = localStorage.getItem("otcPlayed") === "1"; } catch (e) {}
         document.body.classList.add("first");
         var page = document.getElementById("orchard"), button = document.getElementById("play"), label = button.querySelector("span");
-        var promise = document.getElementById("promise"), tapped = false, allowed = false, ready = false, copying = false;
+        var promise = document.getElementById("promise"), tapped = false, allowed = false, ready = false, copying = false, readyAt = 0, waitTimer = 0;
         var agentNow = navigator.userAgent, app = /musical_ly|bytedance|tiktok|trill/i.test(agentNow) ? "TikTok" : /instagram/i.test(agentNow) ? "Instagram" :
           /fban|fbav|fb_iab/i.test(agentNow) ? "Facebook" : /snapchat/i.test(agentNow) ? "Snapchat" : /; wv\)/.test(agentNow) ? "an app" : "";
         var tell = function (words) { if (window.OTCShop && OTCShop.say) OTCShop.say("page: " + words); };
         window.OTCPage = {
           firstVisit: !seen || forced,
           orchard: true,
-          gameReady: function () { ready = true; lift(); }
+          gameReady: function () { ready = true; readyAt = Date.now(); lift(); }
         };
         setTimeout(function () { page.classList.add("ready"); }, 900);
         flying(page);
@@ -423,6 +460,7 @@
               if (reader && reader.state !== 0 && reader.camera === 0) reader.ask(); // the game was here first
               tell("camera allowed");
               label.textContent = "Getting the fruit ready...";
+              showWait();
               lift();
             }, function (error) {
               whyRefused(error, Date.now() - askedAt);
@@ -500,9 +538,40 @@
           tell("camera: " + words.split(".")[0].toLowerCase());
         }
 
-        // Into the game once both are true: the camera is allowed and the game can be played.
+        // The wait after Play: the fruit stops, so nobody tries to slice it, and the card teaches the game beside the real
+        // download. Into the game once the body reader can see them too, so "Starting the camera..." is never on screen
+        // with the camera already on. The game is about 60 MB and the reader about 21 on the way here (17 on phones, with
+        // the lighter body model; early.js counts the reader's files once unpacked).
+        function showWait() {
+          var game = 60, reader = phone ? 17 : 21, unpacked = (phone ? 27.2 : 30.6) * 1048576, past = [], speed = document.getElementById("speed");
+          var fill = document.querySelector("#wait .fill div"), label = function (done) {
+            var total = game + reader, left = Math.round(total - done);
+            fill.style.width = 95 * done / total + "%";
+            past.push([performance.now(), done]);
+            while (past.length > 2 && performance.now() - past[0][0] > 3000) past.shift();
+            var ms = performance.now() - past[0][0], rate = ms > 400 ? (done - past[0][1]) / ms * 1000 : 0;
+            speed.className = left < 2 ? "speed done" : "speed";
+            speed.innerHTML = left < 2 ? "Almost ready" : "<span>Download speed: <b>" + (rate ? rate.toFixed(1) + " MB/s" : "...") + "</b></span><span>" + left + " MB left of " + total + " MB</span>";
+          };
+          var measure = function () {
+            label(game * Math.min(window.OTCGameLoaded || 0, 1) + reader * Math.min((window.OTCReaderGot || 0) / unpacked, 1));
+          };
+          page.classList.add("waiting");
+          measure();
+          waitTimer = setInterval(function () {
+            if (!page.isConnected) return clearInterval(waitTimer);
+            measure();
+            lift();
+          }, 500);
+        }
+
+        // Into the game once the camera is allowed, the game can be played and the body reader has answered (or, should
+        // it never, a minute after the game was ready).
         function lift() {
           if (!allowed || !ready || page.classList.contains("lifting")) return;
+          var body = window.OTCReader, set = body && (body.state === 2 || body.state === -1);
+          if (!set && Date.now() - readyAt < 60000) return;
+          clearInterval(waitTimer);
           page.classList.add("lifting");
           try { localStorage.setItem("otcPlayed", "1"); } catch (e) {}
           setTimeout(function () { page.remove(); }, 600);
@@ -516,7 +585,7 @@
         var kinds = { apple: "#E2553F", orange: "#F0AA5A", plum: "#8E6CC0", lemon: "#F2D35B", lime: "#8DBF5A", watermelon: "#F07A6A" };
         var names = Object.keys(kinds), count = 0;
         var throwOne = function () {
-          if (!page.isConnected || page.classList.contains("lifting")) return;
+          if (!page.isConnected || page.classList.contains("lifting") || page.classList.contains("waiting")) return;
           var name = names[Math.floor(Math.random() * names.length)];
           var fruit = document.createElement("img");
           fruit.className = "fruit";
@@ -594,6 +663,7 @@
           createUnityInstance(document.querySelector("#unity-canvas"), config, function (progress) {
             bar.style.width = Math.round(100 * progress) + "%";
             document.querySelector("#growing div").style.width = Math.round(100 * progress) + "%";
+            window.OTCGameLoaded = progress / 0.9; // the rest of the way is the game starting, not downloading
           }).then(function (game) {
             window.OTCGame = game; // for looking at it from the browser's console (and the phone test's numbers)
             document.getElementById("loading").remove();
