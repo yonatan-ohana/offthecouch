@@ -211,3 +211,33 @@ addEventListener('load', () => setTimeout(() => {
   script.src = '/play/early.js';
   document.head.appendChild(script);
 }, 1500));
+
+// The couch ad: the button under the words opens the film with sound. Opening it and how much was watched go in the
+// visit's story, so the numbers page can show whether the film gets more people to press Play.
+(function film() {
+  const open = document.getElementById('filmOpen');
+  if (!open) return;
+  const win = document.getElementById('filmWin'), video = document.getElementById('filmVideo');
+  const say = (detail) => {
+    try {
+      const from = sessionStorage.getItem('otcFrom'), visit = sessionStorage.getItem('otcVisit');
+      if (!from || !visit) return;
+      const device = /iPhone|iPad|Android|Mobi/.test(navigator.userAgent) || (/Macintosh/.test(navigator.userAgent) && navigator.maxTouchPoints > 1) ? 'phone' : 'computer';
+      fetch('https://api.cuzgames.com/api/step', { method: 'POST', keepalive: true, headers: { 'Content-Type': 'text/plain' },
+        body: JSON.stringify({ step: 'say', detail, count: false, from, device, visit, at: Date.now() - Number(sessionStorage.getItem('otcStart') || Date.now()) }) }).catch(() => {});
+    } catch (e) {}
+  };
+  let told = false;
+  const tell = () => {
+    if (told) return;
+    told = true;
+    say(video.ended ? 'watched the whole film' : `watched ${Math.round(video.currentTime)} s of the film`);
+  };
+  const shut = () => { video.pause(); tell(); win.hidden = true; };
+  open.addEventListener('click', () => { told = false; win.hidden = false; video.currentTime = 0; video.play().catch(() => {}); say('opened the film'); });
+  document.getElementById('filmShut').addEventListener('click', shut);
+  win.addEventListener('click', (e) => { if (e.target === win) shut(); });
+  video.addEventListener('ended', tell);
+  win.querySelector('.next').addEventListener('click', tell);
+  addEventListener('keydown', (e) => { if (e.key === 'Escape' && !win.hidden) shut(); });
+})();

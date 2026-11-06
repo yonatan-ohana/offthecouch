@@ -41,6 +41,7 @@
     <div class="say">
       <h1 class="hand">Play now.<span>No app.<br>No controller.</span></h1>
       <p>Webcam games for the whole family. Wave, duck and jump in front of your camera, right in your browser, Chrome or Safari.</p>
+      <button class="film" type="button" id="filmOpen"><span class="thumb"><img src="video/couch-ad.jpg" alt=""><i></i></span><span><b>See how it works</b><small>A 30-second film, with sound</small></span></button>
       <a class="gift" href="play/?free" data-giveaway hidden>Giveaway: a free copy of all 8 games <b>Get yours →</b></a>
     </div>
 
@@ -93,6 +94,7 @@
     <div class="go" id="go"><a class="gold big green" href="play/">Play free</a></div>
     <a class="freego" href="play/">Play Fruit Slicer free</a>
     <div class="dots" id="dots"></div>
+    <div class="safe" aria-label="Your camera stays yours"><span><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.6" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="3.6" fill="currentColor"/><path d="M5.4 5.4l13.2 13.2" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>Nothing recorded</span><span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V5M7.5 9.5 12 5l4.5 4.5M5 19.5h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M4.5 4.5l15 15" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>Never sent to us</span><span><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M7 10V7a5 5 0 0 1 10 0v3h1.5v11h-13V10zm2.4 0h5.2V7a2.6 2.6 0 0 0-5.2 0z"/></svg>Stays on your device</span></div>
 
 
     <div class="strip">
@@ -187,6 +189,11 @@
   </div>
 </footer>
 
+<div class="filmwin" id="filmWin" hidden>
+  <button class="shut" type="button" id="filmShut" aria-label="Close">×</button>
+  <video id="filmVideo" controls playsinline preload="none" poster="video/couch-ad.jpg" src="video/couch-ad.mp4"></video>
+  <div class="side"><h2 class="hand">Now it's<br>your turn</h2><a class="next" href="play/">Play free</a></div>
+</div>
 <script src="site.js"></script>
 <!-- Counts visits without cookies (Cloudflare Web Analytics; see privacy.html) -->
 <script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "4d95f0af11d34ae38b83c5156d64a12b"}'></script>

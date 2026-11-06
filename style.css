@@ -51,7 +51,7 @@ img, video { display: block; max-width: 100%; }
 @keyframes swing { from { transform: rotate(calc(var(--tilt) - 3deg)); } to { transform: rotate(calc(var(--tilt) + 3deg)); } }
 
 /* What it is, in the dark at the left; it makes way for the free game when another game is in the middle */
-.say { position: absolute; left: calc(var(--u) * 46); top: calc(var(--u) * 150); width: calc(var(--u) * 268); transition: opacity 0.3s; }
+.say { position: absolute; left: calc(var(--u) * 46); top: calc(var(--u) * 124); width: calc(var(--u) * 268); transition: opacity 0.3s; }
 .away .say { opacity: 0; pointer-events: none; }
 .say h1 { font-size: calc(var(--u) * 80); line-height: 0.98; color: var(--gold); white-space: nowrap; }
 .say h1 span { display: block; margin-top: calc(var(--u) * 10); font-size: calc(var(--u) * 54); line-height: 1.05; color: #FFFFFF; }
@@ -286,4 +286,36 @@ img, video { display: block; max-width: 100%; }
   html { scroll-behavior: auto; }
   .note, .sale, .dot, .gold.green, .freego, .card.waiting { animation: none; }
   .note { transform: rotate(var(--tilt)); }
+}
+
+/* The couch ad: a button under the words opens the film with sound, and Play free beside it */
+.film { display: flex; align-items: center; gap: calc(var(--u) * 14); width: 100%; margin-top: calc(var(--u) * 16); padding: calc(var(--u) * 8); border: 0; border-radius: calc(var(--u) * 18); background: var(--velvet); color: #fff; font: inherit; text-align: left; cursor: pointer; box-shadow: 0 calc(var(--u) * 5) 0 var(--shadow); transition: transform 0.15s; }
+.film:hover { transform: translateY(calc(var(--u) * -2)); }
+.film .thumb { position: relative; flex: none; width: calc(var(--u) * 54); height: calc(var(--u) * 96); border-radius: calc(var(--u) * 12); overflow: hidden; background: #000; }
+.film .thumb img { width: 100%; height: 100%; object-fit: cover; }
+.film .thumb i { position: absolute; left: 50%; top: 50%; width: calc(var(--u) * 30); height: calc(var(--u) * 30); margin: calc(var(--u) * -15) 0 0 calc(var(--u) * -15); border-radius: 50%; background: var(--gold); }
+.film .thumb i::after { content: ""; position: absolute; left: 38%; top: 27%; border-style: solid; border-width: calc(var(--u) * 7.5) 0 calc(var(--u) * 7.5) calc(var(--u) * 12); border-color: transparent transparent transparent var(--ink); }
+.film b { display: block; font: 400 calc(var(--u) * 28)/1.05 "Caveat Brush", sans-serif; color: var(--gold); }
+.film small { display: block; margin-top: calc(var(--u) * 6); font-size: calc(var(--u) * 16); line-height: 1.3; color: var(--lilac); }
+.filmwin { position: fixed; inset: 0; z-index: 50; display: flex; align-items: center; justify-content: center; gap: 32px; padding: 16px; background: rgba(16, 11, 32, 0.92); }
+.filmwin video { height: min(90vh, 900px); height: min(90svh, 900px); max-width: 100%; aspect-ratio: 9 / 16; border-radius: 16px; background: #000; }
+.filmwin .side { display: flex; flex-direction: column; align-items: center; gap: 16px; }
+.filmwin h2 { font-size: 44px; line-height: 1.05; color: var(--gold); text-align: center; }
+.filmwin .next { display: inline-flex; align-items: center; justify-content: center; min-height: 60px; padding: 0 36px; border-radius: 999px; background: var(--green); color: #fff; font: 400 34px "Caveat Brush", sans-serif; }
+.filmwin .shut { position: absolute; right: 18px; top: 14px; width: 48px; height: 48px; border: 0; border-radius: 50%; background: var(--velvet); color: #fff; font: 700 26px Nunito, sans-serif; cursor: pointer; }
+@media (max-aspect-ratio: 11 / 10) {
+  .film { width: fit-content; max-width: 100%; margin-left: auto; margin-right: auto; }
+  .film .thumb { width: calc(var(--u) * 60); height: calc(var(--u) * 106); }
+  .filmwin { flex-direction: column; gap: 12px; padding: 12px; }
+  .filmwin video { height: auto; width: min(100%, calc((100svh - 140px) * 9 / 16)); }
+  .filmwin h2 { display: none; }
+  .filmwin .next { min-height: 54px; font-size: 30px; }
+}
+
+/* The camera promise, right under Play free (owner's pick 2026-11-06, the same three lines as the play page) */
+.safe { position: absolute; left: calc(var(--u) * 640); top: calc(var(--u) * 646); transform: translateX(-50%); display: flex; gap: calc(var(--u) * 26); font-size: calc(var(--u) * 19); }
+.safe span { display: inline-flex; align-items: center; color: #FFFFFF; white-space: nowrap; }
+.safe svg { flex: none; width: calc(var(--u) * 26); height: calc(var(--u) * 26); margin-right: calc(var(--u) * 7); color: var(--gold); }
+@media (max-aspect-ratio: 11 / 10) {
+  .safe { position: relative; left: auto; top: auto; transform: none; flex-wrap: wrap; justify-content: center; gap: calc(var(--u) * 8) calc(var(--u) * 18); margin-top: calc(var(--u) * 16); padding: 0 calc(var(--u) * 12); }
 }
